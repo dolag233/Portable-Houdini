@@ -1,6 +1,8 @@
 from language_enum import LANG_ENUM
 
-HFS = r"D:\Houdini 19.5"
+from settings_manager import SettingsManager, SettingsEnum
+SETTINGS_MANAGER = SettingsManager()
+
 LANGUAGE = LANG_ENUM.ZH_CN
 
 

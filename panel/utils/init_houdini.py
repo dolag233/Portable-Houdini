@@ -2,11 +2,12 @@ import os
 import globals
 import sys
 from localization import LANG_STR_ENUM, getLocalizationStr
-from settings_manager import SettingsManager, SettingsEnum
+from settings_manager import SettingsEnum
+from globals import SETTINGS_MANAGER
 from PySide2.QtWidgets import QApplication, QMessageBox
 
 valid_houdini_path = True
-HOUDINI_PATH = SettingsManager().get(SettingsEnum.HOUDINI_PATH)
+HOUDINI_PATH = SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)
 print(HOUDINI_PATH)
 
 # get pylib path

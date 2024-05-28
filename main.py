@@ -9,13 +9,12 @@ from panel.hou_parms_model import HouParmsModel
 from panel.hda_controller import HDAController
 from panel.utils.settings_manager import SettingsEnum, SettingsManager
 from panel.utils.localization import LANG_STR_ENUM, getLocalizationStr
-
-settings = SettingsManager()
-settings.loadSettings()
+from panel.utils.globals import SETTINGS_MANAGER
 
 if __name__ == '__main__':
     # check if houdini_path is valid
-    if not os.path.isdir(settings.get(SettingsEnum.HOUDINI_PATH)):
+    SETTINGS_MANAGER.loadSettings()
+    if not os.path.isdir(SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)):
         msg_box = QMessageBox(QMessageBox.Warning, getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH), getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH_SETTINGS))
         msg_box.exec_()
 
