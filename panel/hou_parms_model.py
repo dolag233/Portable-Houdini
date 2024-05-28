@@ -17,6 +17,7 @@ class HouParamTypeEnum(SimpleEnum):
     BUTTON = None
     # RAMP = None  # not support
     COMBOX = None
+    COLOR = None  # 注意，color有RGB和RGBA两种
 
 
 class HouParamMetaEnum(SimpleEnum):
@@ -103,6 +104,10 @@ class HouParmsModel(QObject):
                 if hasattr(parm, 'evalAsFloats'):
                     parm_type = HouParamTypeEnum.FLOAT_ARRAY
                     parm_value = parm.evalAsFloats()
+                    # 也有可能是颜色属性
+                    if parm_temp.namingScheme() == hou.parmNamingScheme.RGBA:
+                        parm_type = HouParamTypeEnum.COLOR
+
                 elif hasattr(parm, 'evalAsFloat'):
                     parm_type = HouParamTypeEnum.FLOAT
                     parm_value = parm.evalAsFloat()
