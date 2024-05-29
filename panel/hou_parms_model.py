@@ -143,6 +143,7 @@ class HouParmsModel(QObject):
                 parm_combox = HouParmCombox()
                 parm_combox.items = parm.menuItems()
                 parm_combox.labels = parm.menuLabels()
+                parm_value = parm.eval()
 
             parm_meta = HouParmMetadata()
             if parm_type:
