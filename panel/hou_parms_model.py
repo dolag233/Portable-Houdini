@@ -29,7 +29,7 @@ class HouParamMetaEnum(SimpleEnum):
     VALUE_RANGE = None
     COMBOX_DEFINE = None  # {'name': , 'label': }
     DESCRIPTION = None
-    PARM_REF = None
+    PARM_TUPLE_REF = None
     END = None
 
 class HouParmCombox():
@@ -45,7 +45,7 @@ class HouParmMetadata():
         meta[HouParamMetaEnum.LABEL] = parm_label
         meta[HouParamMetaEnum.TYPE] = parm_type_enum
         meta[HouParamMetaEnum.VALUE] = parm_value
-        meta[HouParamMetaEnum.PARM_REF] = parm_ref
+        meta[HouParamMetaEnum.PARM_TUPLE_REF] = parm_ref
         meta[HouParamMetaEnum.DESCRIPTION] = parm_description
         self.meta = meta
 
@@ -191,7 +191,7 @@ class HouParmsModel(QObject):
             return
 
         elif parm_type == HouParamTypeEnum.FLOAT_ARRAY:
-            re_val = parm_meta.getType(HouParamMetaEnum.VALUE)
+            re_val = parm_meta.getData(HouParamMetaEnum.VALUE)
             assert len(re_val) == len(new_parm_value)
             parm_meta.setDataSpecific(HouParamMetaEnum.VALUE, new_parm_value)
 

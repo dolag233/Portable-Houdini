@@ -27,13 +27,15 @@ class HDAPanel(QWidget):
         hda_name = QLabel(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA))
         self.layout.addWidget(hda_name)
 
-    # @TODO
     def clearLayout(self, layout):
-        # 清空布局中的所有组件
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clearLayout(item.layout())
 
     def setHDAName(self, name):
         self._hda_name = name
@@ -82,7 +84,7 @@ class HDAPanel(QWidget):
                 elif parm_type == HouParamTypeEnum.COLOR:
                     array_len = len(parm_value)
                     use_alpha = False if array_len == 3 else True
-                    parm_ui = QColorSelector(use_alpha=False)
+                    parm_ui = QColorSelector(use_alpha=use_alpha)
                     parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.INT:

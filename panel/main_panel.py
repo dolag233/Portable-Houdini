@@ -42,11 +42,20 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.hda_panel)
 
     def updateHDA(self, hda_path, hda_name):
-        if self._controller is not None:
+        if self._controller is not None and self._model is not None:
+            try:
+                import panel.utils.init_houdini
+            except ImportError:
+                return
+
+            # clear
+            self._controller.clearHDA()
+            self._model.clearHDA()
+            self.hda_panel.clearLayout(self.hda_panel.layout)
+
             self._controller.setCurHDAPath(hda_path)
             self._controller.setCurHDAName(hda_name)
             self._controller.loadHDA()
-
             self.hda_panel.setHDAName(hda_name)
             self.hda_panel.updateUI()
             self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE) + " - " + hda_name)

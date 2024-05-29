@@ -11,7 +11,7 @@ class QColorSelector(QWidget):
         super(QColorSelector, self).__init__(parent)
 
         self.use_alpha = use_alpha
-        self.color = QColor(0, 0, 0, 255) if use_alpha else QColor(0, 0, 0)
+        self.color = QColor(1, 1, 1, 255) if use_alpha else QColor(1, 1, 1)
 
         # 创建颜色选择器按钮
         self.color_button = QPushButton("Select Color")

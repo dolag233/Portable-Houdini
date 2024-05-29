@@ -1,5 +1,6 @@
 from hou_parms_model import HouParamMetaEnum, HouParamTypeEnum
 import os
+import sys
 
 class HDAController:
     _CUR_HDA_PATH = None
@@ -42,6 +43,15 @@ class HDAController:
     def setCurHIPName(self, hip_name):
         self._CUR_HIP_NAME = hip_name
 
+    def clearHDA(self):
+        try:
+            import utils.init_houdini
+            import hou
+        except ImportError:
+            return
+
+        hou.hipFile.clear(suppress_save_prompt=True)
+
     def loadHDA(self):
         if self._CUR_HDA_PATH is None and os.path.exists(self._CUR_HDA_NAME):
             return False
@@ -51,6 +61,7 @@ class HDAController:
             import hou
         except ImportError:
             return
+
         _cur_hda_def = hou.hda.definitionsInFile(self._CUR_HDA_PATH)[0]
         # 创建临时hip并创建hda节点
         hou.hipFile.clear(suppress_save_prompt=True)
@@ -72,23 +83,25 @@ class HDAController:
     def writeHDAProperty(self, parm_meta):
         parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
         parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
-        parm_ref = parm_meta.getData(HouParamMetaEnum.PARM_REF)
+        parm_tuple_ref = parm_meta.getData(HouParamMetaEnum.PARM_TUPLE_REF)
         parm_value = parm_meta.getData(HouParamMetaEnum.VALUE)
-        if not parm_ref:
+        if not parm_tuple_ref:
             return
 
         # button不需要赋值，但需要点击
         if parm_type == HouParamTypeEnum.BUTTON:
-            parm_ref.pressButton()
+            parm_tuple_ref.pressButton()
             return
 
-        elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY:
-            re_val = parm_meta.getType(HouParamMetaEnum.VALUE)
+        elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
+            parm_type == HouParamTypeEnum.COLOR:
+            re_val = parm_meta.getData(HouParamMetaEnum.VALUE)
             assert len(re_val) == len(parm_value)
-            parm_ref.set(parm_value)
+            parm_tuple_ref.set(parm_value)
 
         else:
-            parm_ref.set(parm_value)
+            # 因为是parm tuple, 所以要设置tuple值
+            parm_tuple_ref.set((parm_value,))
 
         print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
