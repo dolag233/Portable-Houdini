@@ -1,10 +1,11 @@
 import os
-import globals
 import sys
 from localization import LANG_STR_ENUM, getLocalizationStr
 from settings_manager import SettingsEnum
 from globals import SETTINGS_MANAGER
 from PySide2.QtWidgets import QApplication, QMessageBox
+
+
 
 valid_houdini_path = True
 HOUDINI_PATH = SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)
@@ -45,6 +46,8 @@ if 'hou' not in sys.modules and valid_houdini_path:
     if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
         os.add_dll_directory("{}/bin".format(os.environ["HFS"]))
 
+    # restore PATH after initializing houdini
+    os_path = os.environ.get("path")
     try:
         import hou
     except ImportError:
@@ -53,4 +56,6 @@ if 'hou' not in sys.modules and valid_houdini_path:
     finally:
         if hasattr(sys, "setdlopenflags"):
             sys.setdlopenflags(old_dlopen_flags)
+
+    os.environ["path"] += ";" + os_path
 
