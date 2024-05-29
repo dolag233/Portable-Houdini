@@ -86,8 +86,9 @@ class HDAPanel(QWidget):
                 elif parm_type == HouParamTypeEnum.COLOR:
                     array_len = len(parm_value)
                     use_alpha = False if array_len == 3 else True
-                    parm_ui = QColorSelector(use_alpha=use_alpha)
-                    parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
+                    parm_ui = QColorSelector(use_alpha=use_alpha, use_color01=True)
+                    parm_ui.setValue(parm_value)
+                    parm_ui.valueChanged01.connect(partial(self.updateParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.INT:
                     parm_ui = QIntegerSlider(Qt.Horizontal)
