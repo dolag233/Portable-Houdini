@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtWidgets import QWidget, QHBoxLayout, QColorDialog, QSpinBox, QPushButton
+from PySide2.QtWidgets import QWidget, QHBoxLayout, QColorDialog, QSpinBox, QLabel, QPushButton
 from PySide2.QtCore import Signal
 from PySide2.QtGui import QColor
 
@@ -16,6 +16,11 @@ class QColorSelector(QWidget):
         # 创建颜色选择器按钮
         self.color_button = QPushButton("Select Color")
         self.color_button.clicked.connect(self.openColorDialog)
+
+        # 创建显示当前颜色的标签
+        self.color_display = QLabel()
+        self.color_display.setFixedSize(50, 20)
+        self.updateColorDisplay()
 
         # 创建 RGB(A) 数值显示的 QSpinBox
         self.r_spinbox = QSpinBox()
@@ -38,6 +43,7 @@ class QColorSelector(QWidget):
         # 布局
         layout = QHBoxLayout()
         layout.addWidget(self.color_button)
+        layout.addWidget(self.color_display)
         layout.addWidget(self.r_spinbox)
         layout.addWidget(self.g_spinbox)
         layout.addWidget(self.b_spinbox)
@@ -51,6 +57,7 @@ class QColorSelector(QWidget):
         if color.isValid():
             self.color = color
             self.updateSpinboxes()
+            self.updateColorDisplay()
             self.emitValueChanged()
 
     def updateSpinboxes(self):
@@ -66,17 +73,17 @@ class QColorSelector(QWidget):
         self.color.setBlue(self.b_spinbox.value())
         if self.use_alpha:
             self.color.setAlpha(self.a_spinbox.value())
-        self.updateButtonColor()
+        self.updateColorDisplay()
         self.emitValueChanged()
 
-    def updateButtonColor(self):
-        self.color_button.setStyleSheet(f"background-color: {self.color.name()}")
+    def updateColorDisplay(self):
+        self.color_display.setStyleSheet(f"background-color: {self.color.name()}")
 
     def setValue(self, color):
         if isinstance(color, QColor):
             self.color = color
             self.updateSpinboxes()
-            self.updateButtonColor()
+            self.updateColorDisplay()
             self.emitValueChanged()
         else:
             raise ValueError("setValue expects a QColor instance")
@@ -87,3 +94,13 @@ class QColorSelector(QWidget):
             color_values.append(self.color.alpha())
         self.valueChanged.emit(color_values)
 
+
+if __name__ == "__main__":
+    from PySide2.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+
+    selector = QColorSelector(use_alpha=True)
+    selector.show()
+
+    sys.exit(app.exec_())
