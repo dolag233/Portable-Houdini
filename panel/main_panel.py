@@ -40,55 +40,6 @@ class MainWindow(QMainWindow):
         # Main widget
         self.hda_panel = HDAPanel(self._model)
         self.setCentralWidget(self.hda_panel)
-        self.setUITheme()
-
-    def setUITheme(self):
-        self.setStyleSheet("""
-                    QWidget {
-                        background-color: #2b2b2b;
-                        color: #f0f0f0;
-                        font-size: 14px;
-                    }
-                    QTextEdit, QLineEdit {
-                        background-color: #3c3c3c;
-                        border: 1px solid #555555;
-                        color: #ffffff;
-                    }
-                    QPushButton {
-                        background-color: #5c5c5c;
-                        border: 1px solid #707070;
-                        color: #ffffff;
-                        padding: 5px;
-                        min-width: 60px;
-                    }
-                    QPushButton:hover {
-                        background-color: #6c6c6c;
-                    }
-                    QPushButton:pressed {
-                        background-color: #4c4c4c;
-                    }
-                    QComboBox {
-                        background-color: #3c3c3c;
-                        border: 1px solid #555555;
-                        color: #ffffff;
-                        padding: 5px;
-                        min-width: 80px;
-                    }
-                    QComboBox::drop-down {
-                        border: 0px;
-                    }
-                    QComboBox::down-arrow {
-                        image: url(noimg.png);  /* Placeholder, ensure to replace with a valid image */
-                        width: 10px;
-                        height: 10px;
-                    }
-                    QComboBox QAbstractItemView {
-                        background-color: #3c3c3c;
-                        border: 1px solid #555555;
-                        color: #ffffff;
-                        selection-background-color: #5c5c5c;
-                    }
-                """)
 
     def updateHDA(self, hda_path, hda_name):
         if self._controller is not None:

@@ -3,7 +3,11 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "panel"))
 from PySide2.QtWidgets import QApplication, QMessageBox
+import qdarktheme
+qdarktheme.enable_hi_dpi()
 app = QApplication(sys.argv)
+# stylesheet = load_stylesheet(qtvsc.Theme.LIGHT_VS)
+qdarktheme.setup_theme("auto")
 from panel.main_panel import MainWindow
 from panel.hou_parms_model import HouParmsModel
 from panel.hda_controller import HDAController
