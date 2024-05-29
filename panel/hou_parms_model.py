@@ -77,12 +77,12 @@ class HouParmsModel(QObject):
             import hou
         except ImportError:
             return
-        for parm in node.parms():
-            parm_temp = parm.parmTemplate()
+        for parm_tuple in node.parmTuples():
+            parm_temp = parm_tuple.parmTemplate()
             parm_label = parm_temp.label()
             parm_type = None
             parm_value = None
-            parm_description = parm.description()
+            parm_description = parm_tuple.description()
             parm_range = None
             parm_combox = None
             if isinstance(parm_temp, hou.StringParmTemplate):
@@ -90,49 +90,49 @@ class HouParmsModel(QObject):
                     parm_type = HouParamTypeEnum.FILE_STRING
                 else:
                     parm_type = HouParamTypeEnum.STRING
-                parm_value = parm.eval()
+                parm_value = parm_tuple.eval()[0]
 
             # scalar
             elif isinstance(parm_temp, hou.FloatParmTemplate) and parm_temp.numComponents() == 1:
                 parm_type = HouParamTypeEnum.FLOAT
-                parm_value = parm.eval()
+                parm_value = parm_tuple.eval()[0]
                 parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
 
             # vector
             elif isinstance(parm_temp, hou.FloatParmTemplate) and parm_temp.numComponents() > 1:
                 parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
-                if hasattr(parm, 'evalAsFloats'):
+                if hasattr(parm_tuple, 'evalAsFloats'):
                     parm_type = HouParamTypeEnum.FLOAT_ARRAY
-                    parm_value = parm.evalAsFloats()
+                    parm_value = parm_tuple.evalAsFloats()
                     # 也有可能是颜色属性
                     if parm_temp.namingScheme() == hou.parmNamingScheme.RGBA:
                         parm_type = HouParamTypeEnum.COLOR
 
-                elif hasattr(parm, 'evalAsFloat'):
+                elif hasattr(parm_tuple, 'evalAsFloat'):
                     parm_type = HouParamTypeEnum.FLOAT
-                    parm_value = parm.evalAsFloat()
+                    parm_value = parm_tuple.evalAsFloat()
                 else:
                     continue
 
             elif isinstance(parm_temp, hou.IntParmTemplate) and parm_temp.numComponents() == 1:
                 parm_type = HouParamTypeEnum.INT
-                parm_value = parm.eval()
+                parm_value = parm_tuple.eval()[0]
                 parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
 
             elif isinstance(parm_temp, hou.IntParmTemplate) and parm_temp.numComponents() > 1:
                 parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
-                if hasattr(parm, 'evalAsInts'):
+                if hasattr(parm_tuple, 'evalAsInts'):
                     parm_type = HouParamTypeEnum.INT_ARRAY
-                    parm_value = parm.evalAsInts()
-                elif hasattr(parm, 'evalAsInt'):
+                    parm_value = parm_tuple.evalAsInts()
+                elif hasattr(parm_tuple, 'evalAsInt'):
                     parm_type = HouParamTypeEnum.INT
-                    parm_value = parm.evalAsInt()
+                    parm_value = parm_tuple.evalAsInt()
                 else:
                     continue
 
             elif isinstance(parm_temp, hou.ToggleParmTemplate):
                 parm_type = HouParamTypeEnum.TOGGLE
-                parm_value = parm.eval()
+                parm_value = parm_tuple.eval()[0]
 
             elif isinstance(parm_temp, hou.ButtonParmTemplate):
                 parm_type = HouParamTypeEnum.BUTTON
@@ -141,13 +141,13 @@ class HouParmsModel(QObject):
             elif isinstance(parm_temp, hou.MenuParmTemplate):
                 parm_type = HouParamTypeEnum.COMBOX
                 parm_combox = HouParmCombox()
-                parm_combox.items = parm.menuItems()
-                parm_combox.labels = parm.menuLabels()
-                parm_value = parm.eval()
+                parm_combox.items = parm_temp.menuItems()
+                parm_combox.labels = parm_temp.menuLabels()
+                parm_value = parm_tuple.eval()[0]
 
             parm_meta = HouParmMetadata()
             if parm_type:
-                parm_meta.setData(parm.name(), parm_label, parm_type, parm_value, parm_description, parm)
+                parm_meta.setData(parm_tuple.name(), parm_label, parm_type, parm_value, parm_description, parm_tuple)
                 if parm_range is not None:
                     parm_meta.setDataSpecific(HouParamMetaEnum.VALUE_RANGE, parm_range)
 

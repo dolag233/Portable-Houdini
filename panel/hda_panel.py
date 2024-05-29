@@ -5,6 +5,7 @@ from qwidget.qt_float_slider import QFloatSlider
 from qwidget.qt_int_slider import QIntegerSlider
 from qwidget.qt_file_string import QFileString
 from qwidget.qt_color_selector import QColorSelector
+from qwidget.qt_vector_spinbox import QIntVectorSpinBox, QFloatVectorSpinBox
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParamTypeEnum, HouParamMetaEnum
 from functools import partial
@@ -58,23 +59,19 @@ class HDAPanel(QWidget):
                     parm_ui.setText(parm_value)
                     parm_ui.filePathEntered.connect(partial(self.updateParm, parm_name))
 
-                # @TODO 滑块松开时再触发
                 elif parm_type == HouParamTypeEnum.FLOAT:
                     parm_ui = QFloatSlider(Qt.Horizontal)
                     parm_ui.setRange(parm_range[0], parm_range[1])
+                    print(parm_value)
                     parm_ui.setValue(parm_value)
                     parm_ui.floatValueChanged.connect(partial(self.updateParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.FLOAT_ARRAY:
-                    # @TODO 这里做个专门的widget比较好
                     array_len = len(parm_value)
-                    parm_ui = []
-                    for i in range(array_len):
-                        tmp_ui = QDoubleSpinBox()
-                        tmp_ui.setValue(parm_value[i])
-                        tmp_ui.setRange(parm_range[0], parm_range[1])
-                        tmp_ui.valueChanged.connect(partial(self.updateVectorParmFromCombox, parm_name))
-                        parm_ui.append(tmp_ui)
+                    parm_ui = QFloatVectorSpinBox(vector_length=array_len)
+                    parm_ui.setRange(parm_range[0], parm_range[1])
+                    parm_ui.setValue(parm_value)
+                    parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.COLOR:
                     array_len = len(parm_value)
@@ -90,13 +87,10 @@ class HDAPanel(QWidget):
 
                 elif parm_type == HouParamTypeEnum.INT_ARRAY:
                     array_len = len(parm_value)
-                    parm_ui = []
-                    for i in range(array_len):
-                        tmp_ui = QSpinBox()
-                        tmp_ui.setValue(parm_value[i])
-                        tmp_ui.setRange(parm_range[0], parm_range[1])
-                        tmp_ui.valueChanged.connect(partial(self.updateVectorParmFromCombox, parm_name))
-                        parm_ui.append(tmp_ui)
+                    parm_ui = QIntVectorSpinBox(vector_length=array_len)
+                    parm_ui.setRange(parm_range[0], parm_range[1])
+                    parm_ui.setValue(parm_value)
+                    parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.TOGGLE:
                     parm_ui = QCheckBox()
@@ -133,9 +127,3 @@ class HDAPanel(QWidget):
         if self._model is not None:
             self._model.setParmFromView(parm_name, parm_value)
 
-    def updateVectorParmFromCombox(self, parm_name, parm_value):
-        # @TODO
-        parms = self._parms_widget[parm_name]
-        parm_value = [parm.value() for parm in parms]
-        if self._model is not None:
-            self._model.setParmFromView(parm_name, parm_value)
