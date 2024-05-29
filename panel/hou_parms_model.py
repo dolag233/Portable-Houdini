@@ -100,7 +100,7 @@ class HouParmsModel(QObject):
 
             # vector
             elif isinstance(parm_temp, hou.FloatParmTemplate) and parm_temp.numComponents() > 1:
-                parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
+                # vector的range不起作用
                 if hasattr(parm_tuple, 'evalAsFloats'):
                     parm_type = HouParamTypeEnum.FLOAT_ARRAY
                     parm_value = parm_tuple.evalAsFloats()
@@ -120,7 +120,7 @@ class HouParmsModel(QObject):
                 parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
 
             elif isinstance(parm_temp, hou.IntParmTemplate) and parm_temp.numComponents() > 1:
-                parm_range = [parm_temp.minValue(), parm_temp.maxValue()]
+                # vector的range不起作用
                 if hasattr(parm_tuple, 'evalAsInts'):
                     parm_type = HouParamTypeEnum.INT_ARRAY
                     parm_value = parm_tuple.evalAsInts()

@@ -77,7 +77,9 @@ class HDAPanel(QWidget):
                 elif parm_type == HouParamTypeEnum.FLOAT_ARRAY:
                     array_len = len(parm_value)
                     parm_ui = QFloatVectorSpinBox(vector_length=array_len)
-                    parm_ui.setRange(parm_range[0], parm_range[1])
+                    if parm_range is not None:
+                        parm_ui.setRange(parm_range[0], parm_range[1])
+
                     parm_ui.setValue(parm_value)
                     parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
@@ -96,7 +98,9 @@ class HDAPanel(QWidget):
                 elif parm_type == HouParamTypeEnum.INT_ARRAY:
                     array_len = len(parm_value)
                     parm_ui = QIntVectorSpinBox(vector_length=array_len)
-                    parm_ui.setRange(parm_range[0], parm_range[1])
+                    if parm_range is not None:
+                        parm_ui.setRange(parm_range[0], parm_range[1])
+
                     parm_ui.setValue(parm_value)
                     parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
