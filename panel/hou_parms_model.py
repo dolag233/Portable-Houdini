@@ -90,7 +90,7 @@ class HouParmsModel(QObject):
                     parm_type = HouParamTypeEnum.FILE_STRING
                 else:
                     parm_type = HouParamTypeEnum.STRING
-                parm_value = parm_tuple.eval()[0]
+                parm_value = parm_tuple[0].rawValue()
 
             # scalar
             elif isinstance(parm_temp, hou.FloatParmTemplate) and parm_temp.numComponents() == 1:
