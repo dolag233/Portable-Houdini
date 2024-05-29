@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
             self._controller.setCurHDAName(hda_name)
             self._controller.loadHDA()
 
+            self.hda_panel.setHDAName(hda_name)
             self.hda_panel.updateUI()
             self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE) + " - " + hda_name)
 

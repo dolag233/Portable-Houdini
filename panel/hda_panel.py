@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider,
+from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox,
                                QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox)
 from PySide2.QtCore import Qt
 from qwidget.qt_float_slider import QFloatSlider
@@ -13,6 +13,7 @@ from functools import partial
 class HDAPanel(QWidget):
     _model = None
     _parms_widget = {}
+    _hda_name = ""
 
     def __init__(self, model):
         super().__init__()
@@ -26,6 +27,7 @@ class HDAPanel(QWidget):
         hda_name = QLabel(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA))
         self.layout.addWidget(hda_name)
 
+    # @TODO
     def clearLayout(self, layout):
         # 清空布局中的所有组件
         while layout.count():
@@ -33,9 +35,13 @@ class HDAPanel(QWidget):
             if child.widget():
                 child.widget().deleteLater()
 
+    def setHDAName(self, name):
+        self._hda_name = name
 
     def updateUI(self):
         self.clearLayout(self.layout)
+
+        main_parm_layout = QVBoxLayout()
         if self._model is not None:
             parms_meta = self._model.getParms()
             for parm_meta in parms_meta:
@@ -116,7 +122,11 @@ class HDAPanel(QWidget):
                         parm_layout.addWidget(parm_label_ui)
                     parm_layout.addWidget(parm_ui)
 
-                    self.layout.addLayout(parm_layout)
+                    main_parm_layout.addLayout(parm_layout)
+
+        group_box = QGroupBox(self._hda_name)
+        group_box.setLayout(main_parm_layout)
+        self.layout.addWidget(group_box)
 
     def updateParm(self, parm_name, parm_value):
         if self._model is not None:
