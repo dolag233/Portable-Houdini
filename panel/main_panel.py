@@ -12,6 +12,7 @@ from hda_panel import HDAPanel
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParmsModel
 from hda_controller import HDAController
+from utils.globals import SETTINGS_MANAGER, SettingsEnum
 
 
 class MainWindow(QMainWindow):
@@ -40,6 +41,10 @@ class MainWindow(QMainWindow):
         # Main widget
         self.hda_panel = HDAPanel(self._model)
         self.setCentralWidget(self.hda_panel)
+
+        # 打开上一次打开的hda
+        if len(SETTINGS_MANAGER.get(SettingsEnum.RECENT)) > 0:
+            file_menu.openRecentFile(SETTINGS_MANAGER.get(SettingsEnum.RECENT)[0])
 
     def updateHDA(self, hda_path, hda_name):
         if self._controller is not None and self._model is not None:

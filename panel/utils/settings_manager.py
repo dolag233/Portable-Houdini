@@ -7,6 +7,7 @@ from language_enum import LANG_ENUM
 class SettingsEnum():
     HOUDINI_PATH = "HOUDINI_PATH"
     LANGUAGE = "LANGUAGE"
+    RECENT = "RECENT"
 
 
 LANG_MAP = {
@@ -14,6 +15,7 @@ LANG_MAP = {
     LANG_ENUM.ZH_CN: ("zh_cn", 1)
 }
 
+MAX_RECENT = 8
 
 def getSettingsLanguageKeyIndex(lang_idx):
     if lang_idx in LANG_MAP:
@@ -29,7 +31,8 @@ class SettingsManager:
             cls._instance = super(SettingsManager, cls).__new__(cls)
             cls._instance._settings = {
                 SettingsEnum.HOUDINI_PATH: "",
-                SettingsEnum.LANGUAGE: "zh_cn"
+                SettingsEnum.LANGUAGE: "zh_cn",
+                SettingsEnum.RECENT: []
             }
             cls._instance._file_path = cls._instance._getSettingsFilePath()
             cls._instance.loadSettings()
@@ -58,6 +61,13 @@ class SettingsManager:
         with open(self._file_path, 'w') as f:
             json.dump(self._settings, f, indent=4)
 
+    # temp
+    def appendRecentFiles(self, file_path):
+        if file_path in self._settings[SettingsEnum.RECENT]:
+            self._settings[SettingsEnum.RECENT].remove(file_path)
+
+        self._settings[SettingsEnum.RECENT] = [file_path] + self._settings[SettingsEnum.RECENT][:MAX_RECENT]
+
     def get(self, key):
         return self._settings[key]
 
@@ -70,12 +80,3 @@ class SettingsManager:
     def __setitem__(self, key, value):
         self.set(key, value)
 
-
-# 示例使用
-if __name__ == "__main__":
-    settings = SettingsManager()
-    settings["HOUDINI_PATH"] = "/path/to/houdini"
-    settings["LANGUAGE"] = "zh_cn"
-
-    print(f"HOUDINI_PATH: {settings['HOUDINI_PATH']}")
-    print(f"LANGUAGE: {settings['LANGUAGE']}")
