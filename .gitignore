@@ -1,5 +1,6 @@
 .idea
 venv
+!venv/.placeholder
 __pycache__/
 *.pyc
 test/backup
