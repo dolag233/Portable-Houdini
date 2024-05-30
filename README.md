@@ -33,8 +33,22 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 ## 使用方法
 
-1. 初次使用时需要点击**设置>常规设置**以设置Houdini的安装路径。默认安装路径是***C:\Program Files\Side Effects Software\Houdini xx.xx**。
+1. 初次使用时需要点击**设置>常规设置**以设置Houdini的安装路径。默认安装路径是**C:\Program Files\Side Effects Software\Houdini xx.xx**。
 2. 点击**文件>打开HDA**即可打开HDA文件。点击之后会自动读取并绘制HDA参数界面。
+
+## 路线图
+
+> 我写了!=我要做
+
+- [ ] 支持文件批处理
+- [ ] 支持自动Recook开关
+- [ ] 支持(几乎)全部变量类型
+- [ ] 支持变量禁用和隐藏
+- [ ] 支持进度条显示
+- [ ] 支持设置主题色
+- [ ] 支持简单属性窗口文件夹
+- [ ] 支持前后端数据双向同步(支持表达式)
+- [ ] 支持模型预览
 
 ---
 
@@ -72,3 +86,15 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 1. **Initial Setup**: On first use, click **Settings > General Settings** to set the Houdini installation path. The default installation path is **C:\Program Files\Side Effects Software\Houdini xx.xx**.
 2. **Open HDA File**: Click **File > Open HDA** to open an HDA file. The tool will automatically read and render the HDA parameter interface.
+
+## Roadmap
+
+- [ ] Support batch file processing
+- [ ] Support auto Recook toggle
+- [ ] Support (almost) all variable types
+- [ ] Support variable disabling and hiding
+- [ ] Support progress bar display
+- [ ] Support theme color settings
+- [ ] Support simple property window folders
+- [ ] Support bidirectional front-end and back-end data synchronization (support expressions)
+- [ ] Support model preview
