@@ -40,10 +40,6 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 ---
 
-Sure, here is the translated document:
-
----
-
 ## Introduction
 
 **Portable Houdini** is a portable, standalone Houdini interface that allows loading HDA files and adjusting parameters without opening Houdini. It is suitable for use in the procedural generation process, enabling artists to use the HDA and this tool without any prior knowledge or dependency installations, making it a plug-and-play solution.
