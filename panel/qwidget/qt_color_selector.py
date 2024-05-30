@@ -16,13 +16,9 @@ class QColorSelector(QWidget):
         self.color = QColor(255, 255, 255, 255) if use_alpha else QColor(255, 255, 255)
 
         # 创建颜色选择器按钮
-        self.color_button = QPushButton("Select Color")
+        self.color_button = QPushButton()
+        self.color_button.setFixedSize(50, 20)
         self.color_button.clicked.connect(self.openColorDialog)
-
-        # 创建显示当前颜色的标签
-        self.color_display = QLabel()
-        self.color_display.setFixedSize(50, 20)
-        self.updateColorDisplay()
 
         # 创建 RGB(A) 数值显示的 QSpinBox
         self.r_spinbox = QSpinBox()
@@ -45,7 +41,7 @@ class QColorSelector(QWidget):
         # 布局
         layout = QHBoxLayout()
         layout.addWidget(self.color_button)
-        layout.addWidget(self.color_display)
+        self.updateColor()
         layout.addWidget(self.r_spinbox)
         layout.addWidget(self.g_spinbox)
         layout.addWidget(self.b_spinbox)
@@ -54,12 +50,17 @@ class QColorSelector(QWidget):
 
         self.setLayout(layout)
 
+    def updateColor(self):
+        color_name = self.color.name()
+        # 设置按钮样式表
+        self.color_button.setStyleSheet('background-color: {}; color: white; font-size: 16px;'.format(color_name))
+
     def openColorDialog(self):
         color = QColorDialog.getColor(self.color, self, "Select Color")
         if color.isValid():
             self.color = color
             self.updateSpinboxes()
-            self.updateColorDisplay()
+            self.updateColor()
             self.emitValueChanged()
 
     def updateSpinboxes(self):
@@ -76,14 +77,11 @@ class QColorSelector(QWidget):
         self.color.setBlue(self.b_spinbox.value())
         if self.use_alpha:
             self.color.setAlpha(self.a_spinbox.value())
-        self.updateColorDisplay()
+        self.updateColor()
         if self.use_color01:
             self.emitValueChanged01()
         else:
             self.emitValueChanged()
-
-    def updateColorDisplay(self):
-        self.color_display.setStyleSheet(f"background-color: {self.color.name()}")
 
     def setValue(self, color):
         if self.use_color01:
@@ -91,7 +89,7 @@ class QColorSelector(QWidget):
 
         self.color = QColor(*color)
         self.updateSpinboxes()
-        self.updateColorDisplay()
+        self.updateColor()
         if self.use_color01:
             self.emitValueChanged01()
         else:
