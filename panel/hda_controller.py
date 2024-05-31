@@ -111,7 +111,9 @@ class HDAController:
             self._cur_hda_node.setAutoCooking(False)
 
             for parm_meta in parm_metas:
-                self.writeHDAProperty(parm_meta)
+                # force recook的时候并不会点击所有的按钮。但是如果是这样，那么force recook有什么用呢
+                if parm_meta.getData(HouParamMetaEnum.TYPE) != HouParamTypeEnum.BUTTON:
+                    self.writeHDAProperty(parm_meta)
 
             self._cur_hda_node.cook()
             self._cur_hda_node.setAutoCooking(True)
