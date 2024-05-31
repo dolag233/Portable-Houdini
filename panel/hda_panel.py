@@ -13,6 +13,7 @@ from functools import partial
 class HDAPanel(QWidget):
     _model = None
     _parms_widget = {}
+    _parms_value = {}
     _hda_name = ""
 
     def __init__(self, model):
@@ -131,16 +132,38 @@ class HDAPanel(QWidget):
 
                     main_parm_layout.addLayout(parm_layout)
 
+                    # 记录变量值
+                    self._parms_value[parm_name] = parm_value
+
         group_box = QGroupBox(self._hda_name)
         group_box.setLayout(main_parm_layout)
         self.layout.addWidget(group_box)
 
+        # auto recook
+        recook_layout = QHBoxLayout()
+        self.auto_recook_checkbox = QCheckBox(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_AUTO_RECOOK))
+        self.auto_recook_checkbox.setChecked(True)
+        recook_layout.addWidget(self.auto_recook_checkbox)
+
+        self.force_recook_button = QPushButton(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_FORCE_RECOOK))
+        self.force_recook_button.clicked.connect(self.updateAllParms)
+        recook_layout.addWidget(self.force_recook_button)
+
+        self.layout.addLayout(recook_layout)
+
     def updateParm(self, parm_name, parm_value):
         if self._model is not None:
-            self._model.setParmFromView(parm_name, parm_value)
+            self._parms_value[parm_name] = parm_value
+            if self.auto_recook_checkbox.isChecked():
+                self._model.setParmFromView(parm_name, parm_value)
 
     def updateStrParm(self, parm_name):
         parm_value = self._parms_widget[parm_name].text()
         if self._model is not None:
-            self._model.setParmFromView(parm_name, parm_value)
-
+            self._parms_value[parm_name] = parm_value
+            if self.auto_recook_checkbox.isChecked():
+                self._model.setParmFromView(parm_name, parm_value)
+    def updateAllParms(self):
+        if self._model is not None:
+            for parm_name, parm_value in self._parms_value.items():
+                self._model.setParmFromView(parm_name, parm_value)

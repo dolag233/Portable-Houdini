@@ -41,7 +41,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 > 我写了!=我要做
 
 - [ ] 支持文件批处理
-- [ ] 支持自动Recook开关
+- [x] 支持自动Recook开关
 - [ ] 支持(几乎)全部变量类型
 - [ ] 支持ToolTips
 - [ ] 支持变量禁用和隐藏
@@ -91,7 +91,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 ## Roadmap
 
 - [ ] Support batch file processing
-- [ ] Support auto Recook toggle
+- [x] Support auto Recook toggle
 - [ ] Support (almost) all variable types
 - [ ] Support ToolTips
 - [ ] Support variable disabling and hiding

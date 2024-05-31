@@ -15,6 +15,7 @@ class HDAController:
     def __init__(self, model):
         self._model = model
         self._model.view_data_changed.connect(self.writeHDAProperty)
+        self._model.view_datas_changed.connect(self.writeHDAProperties)
 
     def getCurrentHDAPath(self):
         if self._CUR_HDA_PATH is not None:
@@ -105,6 +106,15 @@ class HDAController:
 
         print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
+    def writeHDAProperties(self, parm_metas):
+        if self._cur_hda_node:
+            self._cur_hda_node.setAutoCooking(False)
+
+            for parm_meta in parm_metas:
+                self.writeHDAProperty(parm_meta)
+
+            self._cur_hda_node.cook()
+            self._cur_hda_node.setAutoCooking(True)
 
     def unloadHDA(self):
         self._CUR_HDA_PATH = None

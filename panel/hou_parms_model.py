@@ -60,6 +60,7 @@ class HouParmMetadata():
 
 
 class HouParmsModel(QObject):
+    view_datas_changed = Signal(list)
     view_data_changed = Signal(HouParmMetadata)
     controller_data_changed = Signal(HouParmMetadata)
 
@@ -163,6 +164,14 @@ class HouParmsModel(QObject):
         parm_meta = self.getParmMeta(index_or_key)
         if parm_meta:
             self.view_data_changed.emit(parm_meta)
+
+    def setParmsFromView(self, key_value_dict):
+        parm_metas = []
+        for index_or_key, parm_value in key_value_dict.items():
+            parm_meta = self.getParmMeta(index_or_key)
+            parm_metas.append(parm_meta)
+
+        self.view_datas_changed.emit(parm_metas)
 
     def setParmFromController(self, index_or_key, parm_value):
         self.__setParm(index_or_key, parm_value)
