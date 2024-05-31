@@ -90,7 +90,7 @@ class HDAController:
 
         # button不需要赋值，但需要点击
         if parm_type == HouParamTypeEnum.BUTTON:
-            parm_tuple_ref.pressButton()
+            parm_tuple_ref[0].pressButton()
             return
 
         elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
