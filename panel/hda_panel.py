@@ -113,7 +113,7 @@ class HDAPanel(QWidget):
 
                 elif parm_type == HouParamTypeEnum.BUTTON:
                     parm_ui = QPushButton(parm_label)
-                    parm_ui.clicked.connect(partial(self.updateParm, parm_name, 0))
+                    parm_ui.clicked.connect(partial(self.updateButtonParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.COMBOX:
                     parm_ui = QComboBox()
@@ -156,6 +156,12 @@ class HDAPanel(QWidget):
             self._parms_value[parm_name] = parm_value
             if self.auto_recook_checkbox.isChecked():
                 self._model.setParmFromView(parm_name, parm_value)
+
+    # 不论是否开启auto recook，按下按钮都会触发事件
+    def updateButtonParm(self, parm_name):
+        if self._model is not None:
+            self.updateAllParms()
+            self._model.setParmFromView(parm_name, None)
 
     def updateStrParm(self, parm_name):
         parm_value = self._parms_widget[parm_name].text()

@@ -10,9 +10,9 @@ FBXHeaderExtension:  {
 		Month: 5
 		Day: 31
 		Hour: 23
-		Minute: 29
-		Second: 59
-		Millisecond: 250
+		Minute: 41
+		Second: 12
+		Millisecond: 578
 	}
 	Creator: "FBX SDK/FBX Plugins version 2020.0.1"
 	OtherFlags:  {
@@ -37,13 +37,13 @@ FBXHeaderExtension:  {
 			P: "Original|ApplicationVendor", "KString", "", "", "SideFX Software"
 			P: "Original|ApplicationName", "KString", "", "", "Houdini"
 			P: "Original|ApplicationVersion", "KString", "", "", "19.5.640"
-			P: "Original|DateTime_GMT", "DateTime", "", "", "31/05/2024 15:29:59.248"
+			P: "Original|DateTime_GMT", "DateTime", "", "", "31/05/2024 15:41:12.578"
 			P: "Original|FileName", "KString", "", "", "E:\Repositories\PortableHoudini\out.fbx"
 			P: "LastSaved", "Compound", "", ""
 			P: "LastSaved|ApplicationVendor", "KString", "", "", "SideFX Software"
 			P: "LastSaved|ApplicationName", "KString", "", "", "Houdini"
 			P: "LastSaved|ApplicationVersion", "KString", "", "", "19.5.640"
-			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "31/05/2024 15:29:59.248"
+			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "31/05/2024 15:41:12.578"
 			P: "Original|ApplicationActiveProject", "KString", "", "", "E:\Repositories\PortableHoudini"
 			P: "Original|ApplicationNativeFile", "KString", "", "", "E:\Repositories\PortableHoudini\untitled.hip"
 		}
@@ -80,7 +80,7 @@ GlobalSettings:  {
 
 Documents:  {
 	Count: 1
-	Document: 1781229646464, "", "Scene" {
+	Document: 2844053934400, "", "Scene" {
 		Properties70:  {
 			P: "SourceObject", "object", "", ""
 			P: "ActiveAnimStackName", "KString", "", "", ""
@@ -201,7 +201,7 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Geometry: 1781227699392, "Geometry::box1", "Mesh" {
+	Geometry: 2844078654000, "Geometry::box1", "Mesh" {
 		Vertices: *24 {
 			a: 0.5,-0.5,0.5,-0.5,-0.5,0.5,0.5,0.5,0.5,-0.5,0.5,0.5,-0.5,-0.5,-0.5,0.5,-0.5,-0.5,-0.5,0.5,-0.5,0.5,0.5,-0.5
 		} 
@@ -210,7 +210,7 @@ Objects:  {
 		} 
 		GeometryVersion: 124
 	}
-	Model: 1781229853312, "Model::box1", "Mesh" {
+	Model: 2844076919664, "Model::box1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
@@ -228,10 +228,10 @@ Objects:  {
 Connections:  {
 	
 	;Model::box1, Model::RootNode
-	C: "OO",1781229853312,0
+	C: "OO",2844076919664,0
 	
 	;Geometry::box1, Model::box1
-	C: "OO",1781227699392,1781229853312
+	C: "OO",2844078654000,2844076919664
 }
 ;Takes section
 ;----------------------------------------------------
