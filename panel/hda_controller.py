@@ -107,16 +107,16 @@ class HDAController:
         print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
     def writeHDAProperties(self, parm_metas):
-        if self._cur_hda_node:
-            self._cur_hda_node.setAutoCooking(False)
+        import hou
+        hou.setUpdateMode(hou.updateMode.Manual)
 
-            for parm_meta in parm_metas:
-                # force recook的时候并不会点击所有的按钮。但是如果是这样，那么force recook有什么用呢
-                if parm_meta.getData(HouParamMetaEnum.TYPE) != HouParamTypeEnum.BUTTON:
-                    self.writeHDAProperty(parm_meta)
+        for parm_meta in parm_metas:
+            # force recook的时候并不会点击所有的按钮。但是如果是这样，那么force recook有什么用呢
+            if parm_meta.getData(HouParamMetaEnum.TYPE) != HouParamTypeEnum.BUTTON:
+                self.writeHDAProperty(parm_meta)
 
-            self._cur_hda_node.cook()
-            self._cur_hda_node.setAutoCooking(True)
+        self._cur_hda_node.cook()
+        hou.setUpdateMode(hou.updateMode.AutoUpdate)
 
     def unloadHDA(self):
         self._CUR_HDA_PATH = None
