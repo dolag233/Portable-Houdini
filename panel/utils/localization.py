@@ -6,6 +6,9 @@ class LANG_ENUM(SimpleEnum):
 
 
 class LANG_STR_ENUM(SimpleEnum):
+    UI_APPLY = None
+    UI_CANCEL = None
+    UI_WARNING = None
     UI_APP_TITLE = None
     ERROR_HOU_PATH = None
     ERROR_HOU_PATH_SETTINGS = None
@@ -26,9 +29,22 @@ class LANG_STR_ENUM(SimpleEnum):
     UI_HDAPANEL_EMPTY_HDA = None
     UI_HDAPANEL_AUTO_RECOOK = None
     UI_HDAPANEL_FORCE_RECOOK = None
+    UI_HDAPANEL_BATCH_LABEL = None
+    UI_HDAPANEL_BATCH_BUTTON = None
+    UI_BATCHPANEL_TITLE = None
+    UI_BATCHPANEL_INDEX = None
+    UI_BATCHPANEL_VALUE = None
+    UI_BATCHPANEL_CLEAR = None
+    UI_BATCHPANEL_IMPORT = None
+    UI_BATCHPANEL_INHERIT = None
+    UI_BATCHPANEL_SELECT_REMOVE_ROW = None
+    UI_BATCHPANEL_BUTTON_TOOLTIP = None
 
 
-LANG_MAP = {LANG_STR_ENUM.ERROR_HOU_PATH: {LANG_ENUM.EN_US: "Houdini path not exist.", LANG_ENUM.ZH_CN: "Houdini路径不存在"},
+LANG_MAP = {LANG_STR_ENUM.UI_APPLY: {LANG_ENUM.EN_US: "Apply", LANG_ENUM.ZH_CN: "应用"},
+            LANG_STR_ENUM.UI_CANCEL: {LANG_ENUM.EN_US: "Cancel", LANG_ENUM.ZH_CN: "取消"},
+            LANG_STR_ENUM.UI_WARNING: {LANG_ENUM.EN_US: "Warning", LANG_ENUM.ZH_CN: "警告"},
+            LANG_STR_ENUM.ERROR_HOU_PATH: {LANG_ENUM.EN_US: "Houdini path not exist.", LANG_ENUM.ZH_CN: "Houdini路径不存在"},
             LANG_STR_ENUM.ERROR_HOU_PATH_SETTINGS: {LANG_ENUM.EN_US: "Houdini path not exist, please click Settings>General Settings to set.", LANG_ENUM.ZH_CN: "Houdini路径不存在，请点击设置>常规设置进行设置"},
             LANG_STR_ENUM.UI_APP_TITLE: {LANG_ENUM.EN_US: "Portable Houdini", LANG_ENUM.ZH_CN: "Portable Houdini"},
             LANG_STR_ENUM.ERROR_PYLIB_PATH: {LANG_ENUM.EN_US: "Houdini pylib path not exist.", LANG_ENUM.ZH_CN: "Houdini Pylib路径不存在"},
@@ -48,6 +64,16 @@ LANG_MAP = {LANG_STR_ENUM.ERROR_HOU_PATH: {LANG_ENUM.EN_US: "Houdini path not ex
             LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA: {LANG_ENUM.EN_US: "Select a HDA", LANG_ENUM.ZH_CN: "打开一个HDA"},
             LANG_STR_ENUM.UI_HDAPANEL_AUTO_RECOOK: {LANG_ENUM.EN_US: "Auto Recook", LANG_ENUM.ZH_CN: "自动计算"},
             LANG_STR_ENUM.UI_HDAPANEL_FORCE_RECOOK: {LANG_ENUM.EN_US: "Force Recook", LANG_ENUM.ZH_CN: "强制重新计算"},
+            LANG_STR_ENUM.UI_HDAPANEL_BATCH_LABEL: {LANG_ENUM.EN_US: "Batches: ", LANG_ENUM.ZH_CN: "批处理数: "},
+            LANG_STR_ENUM.UI_HDAPANEL_BATCH_BUTTON: {LANG_ENUM.EN_US: "Batching", LANG_ENUM.ZH_CN: "批处理"},
+            LANG_STR_ENUM.UI_BATCHPANEL_TITLE: {LANG_ENUM.EN_US: "Batch", LANG_ENUM.ZH_CN: "批处理"},
+            LANG_STR_ENUM.UI_BATCHPANEL_INDEX: {LANG_ENUM.EN_US: "Batch Index", LANG_ENUM.ZH_CN: "批次"},
+            LANG_STR_ENUM.UI_BATCHPANEL_VALUE: {LANG_ENUM.EN_US: "Value", LANG_ENUM.ZH_CN: "属性值"},
+            LANG_STR_ENUM.UI_BATCHPANEL_CLEAR: {LANG_ENUM.EN_US: "Clear", LANG_ENUM.ZH_CN: "清空"},
+            LANG_STR_ENUM.UI_BATCHPANEL_IMPORT: {LANG_ENUM.EN_US: "Import", LANG_ENUM.ZH_CN: "导入"},
+            LANG_STR_ENUM.UI_BATCHPANEL_INHERIT: {LANG_ENUM.EN_US: "--Inherit Last Row--", LANG_ENUM.ZH_CN: "--继承上行参数--"},
+            LANG_STR_ENUM.UI_BATCHPANEL_SELECT_REMOVE_ROW: {LANG_ENUM.EN_US: "Select the row to delete", LANG_ENUM.ZH_CN: "选择需要删除的项"},
+            LANG_STR_ENUM.UI_BATCHPANEL_BUTTON_TOOLTIP: {LANG_ENUM.EN_US: "Selected indicates that a click event will be triggered", LANG_ENUM.ZH_CN: "选中表示会触发点击事件"},
             }
 
 

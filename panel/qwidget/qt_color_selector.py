@@ -83,6 +83,9 @@ class QColorSelector(QWidget):
         else:
             self.emitValueChanged()
 
+    def value(self):
+        return list(self.color.getRgbF())
+
     def setValue(self, color):
         if self.use_color01:
             color = [x * 255 for x in color]

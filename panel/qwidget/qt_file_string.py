@@ -26,6 +26,9 @@ class QFileString(QWidget):
     def setText(self, value):
         self.line_edit.setText(value)
 
+    def text(self):
+        return self.line_edit.text()
+
     def open_file_dialog(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*)")
         if file_path:
