@@ -1,4 +1,4 @@
-[![中文](https://img.shields.io/badge/lang-中文-blue.svg)](##简介) [![English](https://img.shields.io/badge/lang-English-red.svg)](##Introduction)
+[![中文](https://img.shields.io/badge/lang-中文-blue.svg)](#简介) [![English](https://img.shields.io/badge/lang-English-red.svg)](#Introduction)
 
 # Portable Houdini
 
