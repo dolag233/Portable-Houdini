@@ -6,7 +6,7 @@
 
 Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Houdini的情况下加载HDA文件并调整参数，并支持配置批处理。适合在程序化生成过程中，将HDA与此工具交付给美术使用，无需任何前置知识和依赖安装，即插即用。
 
-![screenshot](img/screenshot_0.png)
+<p align="center"><img src="img/screenshot_0.png" alt="screenshot" style="zoom:75%;" /></p>
 
 ## 安装方法
 
@@ -40,7 +40,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 每个HDA参数右侧都有一个**✚**按钮，可以设置该参数的批处理值。点击之后会打开如下窗口。
 
-![screenshot](img/screenshot_1.png)
+<p align="center"><img src="img/screenshot_1.png" alt="screenshot" style="zoom:75%;" /></p>
 
 按下左下角的**✚**按钮可以增加一个批处理参数值，选中一个批处理参数后点击旁边的 **-** 按钮可以删掉该参数。
 
@@ -73,7 +73,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 Portable Houdini is a portable standalone Houdini interface that allows loading HDA files and adjusting parameters without opening Houdini. It also supports batch processing configuration. This tool is suitable for use in the procedural generation process, allowing artists to use the HDA files with this tool without any prior knowledge or dependency installations. It's truly plug-and-play.
 
-![screenshot](img/screenshot_0.png)
+<p align="center"><img src="img/screenshot_0.png" alt="screenshot" style="zoom:75%;" /></p>
 
 ## Installation
 
@@ -107,7 +107,7 @@ Portable Houdini is a portable standalone Houdini interface that allows loading 
 
 Each HDA parameter has a **✚** button on its right side, allowing you to set batch processing values for that parameter. Clicking this button opens the following window.
 
-![screenshot](img/screenshot_1.png)
+<p align="center"><img src="img/screenshot_1.png" alt="screenshot" style="zoom:75%;" /></p>
 
 Pressing the **✚** button at the bottom left adds a batch processing parameter value. Selecting a batch processing parameter and clicking the adjacent **-** button removes that parameter.
 
