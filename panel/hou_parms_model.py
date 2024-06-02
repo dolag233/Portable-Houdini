@@ -169,6 +169,7 @@ class HouParmsModel(QObject):
         parm_metas = []
         for index_or_key, parm_value in key_value_dict.items():
             parm_meta = self.getParmMeta(index_or_key)
+            parm_meta.setDataSpecific(HouParamMetaEnum.VALUE, parm_value)
             parm_metas.append(parm_meta)
 
         self.view_datas_changed.emit(parm_metas)
