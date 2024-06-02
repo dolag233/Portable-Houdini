@@ -10,9 +10,11 @@ os.environ["QT_PLUGIN_PATH"] = qt_plugin_path
 
 # load qt style
 from PySide2.QtWidgets import QApplication, QMessageBox
+from PySide2.QtGui import QIcon
 import qdarktheme
 qdarktheme.enable_hi_dpi()
 app = QApplication(sys.argv)
+app.setWindowIcon(QIcon('icon.png'))
 # stylesheet = load_stylesheet(qtvsc.Theme.LIGHT_VS)
 qdarktheme.setup_theme("auto")
 
