@@ -148,7 +148,7 @@ class HDAPanel(QWidget):
                     row_height = self.style().pixelMetric(QStyle.PM_TitleBarHeight) * 1.25
                     batch_button = QPushButton("✚")
                     batch_button.setBaseSize(row_height, row_height)
-                    batch_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+                    batch_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                     batch_button.clicked.connect(partial(self.onClickBatchSettingButton, parm_name))
                     self._batch_buttons[parm_name] = batch_button
                     parm_layout.addWidget(batch_button)
@@ -211,16 +211,16 @@ class HDAPanel(QWidget):
         if parm_name in self._batch_parms_value.keys() and parm_name in self._batch_buttons.keys():
             parm_batch_count = len(self._batch_parms_value[parm_name])
             button = self._batch_buttons[parm_name]
-            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-            button.setText("✚:" + str(parm_batch_count))
-            button.adjustSize()
+            if parm_batch_count > 0:
+                button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+                button.setText("✚:" + str(parm_batch_count))
+                button.adjustSize()
+                button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                button.setStyleSheet("background-color: crimson; color: white;")
+            else:
+                button.setText("✚")
+                button.setStyleSheet("")
 
-            default_palette = self.palette()
-            default_color = default_palette.color(QPalette.Base)
-            new_color = default_color.lighter(300)
-            button.setStyleSheet("background-color: crimson; color: white;")
-
-    # 批处理按钮 @TODO
     def onClickBatchButton(self):
         batch_count = self.getBatchCount()
         for i in range(batch_count):
