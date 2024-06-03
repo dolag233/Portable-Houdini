@@ -234,7 +234,8 @@ class HDAPanel(QWidget):
                 tooltip = "<table border='1' style='border-collapse: collapse;'>"
                 tooltip += "<tr><th>Index</th><th>Value</th></tr>"
                 idx = 1
-                for value in self._batch_parms_value[parm_name]:
+                for i in range(self.getBatchCount()):
+                    value = self._batch_parms_value[parm_name][i] if i < len(self._batch_parms_value[parm_name]) else self._parms_value[parm_name]
                     if parm_type == HouParamTypeEnum.COMBOX:
                         parm_combox = parm_meta.getData(HouParamMetaEnum.COMBOX_DEFINE)
                         combox_labels = parm_combox.labels
