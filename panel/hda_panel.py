@@ -216,10 +216,35 @@ class HDAPanel(QWidget):
                 button.setText("✚:" + str(parm_batch_count))
                 button.adjustSize()
                 button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                button.setStyleSheet("background-color: crimson; color: white;")
+                button.setStyleSheet("background-color: darkslateblue; color: white;")
+                self.updateParmBatchToolTips(parm_name)
             else:
                 button.setText("✚")
                 button.setStyleSheet("")
+
+    def updateParmBatchToolTips(self, parm_name):
+        if parm_name in self._batch_parms_value.keys() and parm_name in self._batch_buttons.keys():
+            parm_batch_count = len(self._batch_parms_value[parm_name])
+            button = self._batch_buttons[parm_name]
+            tooltip = ""
+            parm_batch_count = len(self._batch_parms_value[parm_name])
+            parm_meta = self._parms_meta[parm_name]
+            parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
+            if parm_batch_count > 0:
+                tooltip = "<table border='1' style='border-collapse: collapse;'>"
+                tooltip += "<tr><th>Index</th><th>Value</th></tr>"
+                idx = 1
+                for value in self._batch_parms_value[parm_name]:
+                    if parm_type == HouParamTypeEnum.COMBOX:
+                        parm_combox = parm_meta.getData(HouParamMetaEnum.COMBOX_DEFINE)
+                        combox_labels = parm_combox.labels
+                        value = combox_labels[value]
+
+                    tooltip += "<tr><td>{}</td><td>{}</td></tr>".format(idx, str(value))
+                    idx += 1
+                tooltip += "</table>"
+
+            button.setToolTip(tooltip)
 
     def onClickBatchButton(self):
         batch_count = self.getBatchCount()

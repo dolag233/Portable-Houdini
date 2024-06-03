@@ -10,13 +10,18 @@ os.environ["QT_PLUGIN_PATH"] = qt_plugin_path
 
 # load qt style
 from PySide2.QtWidgets import QApplication, QMessageBox
-from PySide2.QtGui import QIcon
 import qdarktheme
 qdarktheme.enable_hi_dpi()
 app = QApplication(sys.argv)
-app.setWindowIcon(QIcon('icon.png'))
 # stylesheet = load_stylesheet(qtvsc.Theme.LIGHT_VS)
-qdarktheme.setup_theme("auto")
+additional_qss = """
+QToolTip {
+    color: silver; /* 字体颜色 */
+    background-color: #08101F; /* 背景颜色 */
+    border: 1px solid white;
+}
+"""
+qdarktheme.setup_theme("auto", additional_qss=additional_qss)
 
 from panel.main_panel import MainWindow
 from panel.hou_parms_model import HouParmsModel
