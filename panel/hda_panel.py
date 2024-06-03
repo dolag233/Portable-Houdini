@@ -1,6 +1,7 @@
-from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle,
+from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle, QSizePolicy,
                                QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox)
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QFontMetrics, QColor, QBrush, QPalette
 from qwidget.qt_float_slider import QFloatSlider
 from qwidget.qt_int_slider import QIntegerSlider
 from qwidget.qt_file_string import QFileString
@@ -16,6 +17,7 @@ class HDAPanel(QWidget):
     _parms_widget = {}
     _parms_value = {}
     _parms_meta = {}
+    _batch_buttons = {}
     _batch_parms_value = {}
     _hda_name = ""
 
@@ -31,6 +33,15 @@ class HDAPanel(QWidget):
         hda_name = QLabel(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA))
         self.layout.addWidget(hda_name)
 
+    def clearHDAData(self):
+        self._parms_widget = {}
+        self._parms_value = {}
+        self._parms_meta = {}
+        self._batch_buttons = {}
+        self._batch_parms_value = {}
+        self._hda_name = ""
+        self.clearLayout(self.layout)
+
     def clearLayout(self, layout):
         if layout is not None:
             while layout.count():
@@ -45,7 +56,7 @@ class HDAPanel(QWidget):
         self._hda_name = name
 
     def updateUI(self):
-        self.clearLayout(self.layout)
+        self.clearHDAData()
 
         main_parm_layout = QVBoxLayout()
         if self._model is not None:
@@ -136,8 +147,10 @@ class HDAPanel(QWidget):
                     # 批处理按钮
                     row_height = self.style().pixelMetric(QStyle.PM_TitleBarHeight) * 1.25
                     batch_button = QPushButton("✚")
-                    batch_button.setFixedSize(row_height, row_height)
+                    batch_button.setBaseSize(row_height, row_height)
+                    batch_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
                     batch_button.clicked.connect(partial(self.onClickBatchSettingButton, parm_name))
+                    self._batch_buttons[parm_name] = batch_button
                     parm_layout.addWidget(batch_button)
 
                     main_parm_layout.addLayout(parm_layout)
@@ -193,8 +206,19 @@ class HDAPanel(QWidget):
 
         return batch_count
 
-    def updateBatchLabel(self):
+    def updateBatchIcons(self, parm_name):
         self.batch_label.setText(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_BATCH_LABEL) + str(self.getBatchCount()))
+        if parm_name in self._batch_parms_value.keys() and parm_name in self._batch_buttons.keys():
+            parm_batch_count = len(self._batch_parms_value[parm_name])
+            button = self._batch_buttons[parm_name]
+            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+            button.setText("✚:" + str(parm_batch_count))
+            button.adjustSize()
+
+            default_palette = self.palette()
+            default_color = default_palette.color(QPalette.Base)
+            new_color = default_color.lighter(300)
+            button.setStyleSheet("background-color: crimson; color: white;")
 
     # 批处理按钮 @TODO
     def onClickBatchButton(self):
@@ -233,7 +257,7 @@ class HDAPanel(QWidget):
 
     def updateBatchInfo(self, parm_name, parms_value):
         self._batch_parms_value[parm_name] = parms_value
-        self.updateBatchLabel()
+        self.updateBatchIcons(parm_name)
 
     def updateParm(self, parm_name, parm_value):
         if self._model is not None:
