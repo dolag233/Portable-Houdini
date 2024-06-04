@@ -283,7 +283,8 @@ class HDAPanel(QWidget):
 
     def updateBatchInfo(self, parm_name, parms_value):
         self._batch_parms_value[parm_name] = parms_value
-        self.updateBatchIcons(parm_name)
+        for parm_name in self._batch_parms_value.keys():
+            self.updateBatchIcons(parm_name)
 
     def updateParm(self, parm_name, parm_value):
         if self._model is not None:
