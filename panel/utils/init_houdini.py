@@ -5,6 +5,8 @@ from settings_manager import SettingsEnum
 from globals import SETTINGS_MANAGER
 from PySide2.QtWidgets import QApplication, QMessageBox
 
+# restore PATH after initializing houdini
+os_path = os.environ["path"]
 if 'hou' not in sys.modules:
     print("Try to initialize Houdini environment")
 
@@ -46,8 +48,6 @@ if 'hou' not in sys.modules:
         if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
             os.add_dll_directory("{}/bin".format(os.environ["HFS"]))
 
-        # restore PATH after initializing houdini
-        os_path = os.environ.get("path")
         try:
             import hou
         except ImportError:
