@@ -75,7 +75,7 @@ class HDAPanel(QWidget):
                 if parm_type == HouParamTypeEnum.STRING:
                     parm_ui = QLineEdit()
                     parm_ui.setText(parm_value)
-                    parm_ui.returnPressed.connect(partial(self.updateStrParm, parm_name))
+                    parm_ui.editingFinished.connect(partial(self.updateStrParm, parm_name))
 
                 elif parm_type == HouParamTypeEnum.FILE_STRING:
                     parm_ui = QFileString()
