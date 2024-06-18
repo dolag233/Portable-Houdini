@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle, QSizePolicy,
+from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle, QSizePolicy, QToolButton,
                                QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox)
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFontMetrics, QColor, QBrush, QPalette
@@ -163,7 +163,17 @@ class HDAPanel(QWidget):
         group_box.setLayout(main_parm_layout)
         self.layout.addWidget(group_box)
 
-        bottom_info_layout = QHBoxLayout()
+        # expansion button
+        self.twirl_layout = QVBoxLayout()
+        self.twirl_layout.setAlignment(Qt.AlignCenter)
+        twirl_button = QToolButton()
+        twirl_button.setText(getLocalizationStr(LANG_STR_ENUM.UI_TWIRL_EXPANSION_DESCRIPTION))
+        twirl_button.setStyleSheet("QToolButton { border: none; color: lightpink;}")
+        twirl_button.clicked.connect(self.toggleButtonLayoutVisibilityFromExpansionButton)
+        self.twirl_layout.addWidget(twirl_button)
+        self.layout.addLayout(self.twirl_layout)
+
+        self.bottom_info_layout = QHBoxLayout()
         # batch size
         self.batch_label = QLabel(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_BATCH_LABEL) + str(self.getBatchCount()))
         batch_button = QPushButton(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_BATCH_BUTTON))
@@ -194,9 +204,58 @@ class HDAPanel(QWidget):
         groupbox_layout.addWidget(recook_groupbox)
 
         # 将水平布局添加到底部信息布局
-        bottom_info_layout.addLayout(groupbox_layout)
+        self.bottom_info_layout.addLayout(groupbox_layout)
+        self.layout.addLayout(self.bottom_info_layout)
 
-        self.layout.addLayout(bottom_info_layout)
+        # collapse
+        # expansion button
+        self.collapse_layout = QVBoxLayout()
+        self.collapse_layout.setAlignment(Qt.AlignCenter)
+        collapse_button = QToolButton()
+        collapse_button.setText(getLocalizationStr(LANG_STR_ENUM.UI_TWIRL_COLLAPSE_DESCRIPTION))
+        collapse_button.setStyleSheet("QToolButton { border: none; color: lightpink;}")
+        collapse_button.clicked.connect(self.toggleButtonLayoutVisibilityFromCollapseButton)
+        self.collapse_layout.addWidget(collapse_button)
+        self.layout.addLayout(self.collapse_layout)
+
+        self.setVisibility(self.collapse_layout, False)
+        self.setVisibility(self.bottom_info_layout, False)
+
+    def toggleButtonLayoutVisibilityFromExpansionButton(self):
+        self.toggleVisibility(self.bottom_info_layout)
+        self.setVisibility(self.twirl_layout, False)
+        self.setVisibility(self.collapse_layout, True)
+        self.layout.update()
+        self.adjustSize()
+
+    def toggleButtonLayoutVisibilityFromCollapseButton(self):
+        self.toggleVisibility(self.bottom_info_layout)
+        self.setVisibility(self.twirl_layout, True)
+        self.setVisibility(self.collapse_layout, False)
+        self.layout.update()
+        self.adjustSize()
+
+    def toggleVisibility(self, layout):
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if isinstance(item, QHBoxLayout) or isinstance(item, QVBoxLayout):
+                self.toggleVisibility(item)
+            elif isinstance(item.widget(), QGroupBox):
+                self.toggleVisibility(item.widget().layout())
+                item.widget().setVisible(not item.widget().isVisible())
+            elif item.widget():
+                item.widget().setVisible(not item.widget().isVisible())
+
+    def setVisibility(self, layout, visibility):
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if isinstance(item, QHBoxLayout) or isinstance(item, QVBoxLayout):
+                self.setVisibility(item, visibility)
+            elif isinstance(item.widget(), QGroupBox):
+                self.setVisibility(item.widget().layout(), visibility)
+                item.widget().setVisible(visibility)
+            elif item.widget():
+                item.widget().setVisible(visibility)
 
     def getBatchCount(self):
         batch_count = 0
