@@ -1,6 +1,7 @@
 from hou_parms_model import HouParamMetaEnum, HouParamTypeEnum
 import os
-import sys
+import threading
+import time
 
 class HDAController:
     _CUR_HDA_PATH = None
@@ -82,6 +83,7 @@ class HDAController:
 
     # @TODO 这个函数需要链接到个signal
     def writeHDAProperty(self, parm_meta):
+        start_time = time.time()
         parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
         parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
         parm_tuple_ref = parm_meta.getData(HouParamMetaEnum.PARM_TUPLE_REF)
@@ -92,6 +94,8 @@ class HDAController:
         # button不需要赋值，但需要点击
         if parm_type == HouParamTypeEnum.BUTTON:
             parm_tuple_ref[0].pressButton()
+            print("click button {}".format(parm_name))
+            print("use time: {}".format(time.time() - start_time))
             return
 
         elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
@@ -105,6 +109,7 @@ class HDAController:
             parm_tuple_ref.set((parm_value,))
 
         print('change parm "{}" value to {}'.format(parm_name, parm_value))
+        print("use time: {}".format(time.time() - start_time))
 
     def writeHDAProperties(self, parm_metas):
         import hou
