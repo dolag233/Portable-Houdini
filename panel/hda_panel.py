@@ -50,7 +50,8 @@ class HDAPanel(QWidget):
         self.progress_bar_timer.start()
 
     def hideProgressBar(self):
-        self.progress_bar.hide()
+        self.progress_bar_timer.stop()
+        self.progress_bar.close()
 
     def clearHDAData(self):
         self._parms_widget = {}

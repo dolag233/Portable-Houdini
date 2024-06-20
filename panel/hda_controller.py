@@ -103,24 +103,20 @@ class HDAController(QObject):
         if parm_type == HouParamTypeEnum.BUTTON:
             parm_tuple_ref[0].pressButton()
             print("click button {}".format(parm_name))
-            print("use time: {}".format(time.time() - start_time))
-
-            self.cook_finished.emit()
-            return
 
         elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
             parm_type == HouParamTypeEnum.COLOR:
             re_val = parm_meta.getData(HouParamMetaEnum.VALUE)
             assert len(re_val) == len(parm_value)
             parm_tuple_ref.set(parm_value)
+            print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
         else:
             # 因为是parm tuple, 所以要设置tuple值
             parm_tuple_ref.set((parm_value,))
+            print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
-        print('change parm "{}" value to {}'.format(parm_name, parm_value))
         print("use time: {}".format(time.time() - start_time))
-
         self.cook_finished.emit()
 
     def writeHDAProperties(self, parm_metas):
