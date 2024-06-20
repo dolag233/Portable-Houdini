@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
         menubar.addMenu(settings_menu)
 
         # Main widget
-        self.hda_panel = HDAPanel(self._model)
+        self.hda_panel = HDAPanel(self._model, self._controller)
         self.setCentralWidget(self.hda_panel)
 
         # 打开上一次打开的hda

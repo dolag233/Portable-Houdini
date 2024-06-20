@@ -1,9 +1,15 @@
 from hou_parms_model import HouParamMetaEnum, HouParamTypeEnum
+from utils.globals import APP
+from qwidget.qt_progress_bar import QProgressBarWidget
+from PySide2.QtCore import QTimer, Qt, Signal, QObject, QThread, Slot
+from functools import partial
 import os
 import threading
 import time
 
-class HDAController:
+class HDAController(QObject):
+    cook_started = Signal()
+    cook_finished = Signal()
     _CUR_HDA_PATH = None
     _CUR_HDA_NAME = None
     _CUR_HIP_PATH = None
@@ -14,6 +20,7 @@ class HDAController:
     _model = None
 
     def __init__(self, model):
+        super().__init__()
         self._model = model
         self._model.view_data_changed.connect(self.writeHDAProperty)
         self._model.view_datas_changed.connect(self.writeHDAProperties)
@@ -81,8 +88,9 @@ class HDAController:
         if self._model is not None:
             self._model.setParmFromController(parm_value, parm_name)
 
-    # @TODO 这个函数需要链接到个signal
     def writeHDAProperty(self, parm_meta):
+        self.cook_started.emit()
+
         start_time = time.time()
         parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
         parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
@@ -96,6 +104,8 @@ class HDAController:
             parm_tuple_ref[0].pressButton()
             print("click button {}".format(parm_name))
             print("use time: {}".format(time.time() - start_time))
+
+            self.cook_finished.emit()
             return
 
         elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
@@ -110,6 +120,8 @@ class HDAController:
 
         print('change parm "{}" value to {}'.format(parm_name, parm_value))
         print("use time: {}".format(time.time() - start_time))
+
+        self.cook_finished.emit()
 
     def writeHDAProperties(self, parm_metas):
         import hou

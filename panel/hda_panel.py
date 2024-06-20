@@ -1,12 +1,14 @@
 from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle, QSizePolicy, QToolButton,
-                               QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox)
-from PySide2.QtCore import Qt
+                               QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox,
+                               QProgressBar)
+from PySide2.QtCore import Qt, QThread, QTimer
 from PySide2.QtGui import QFontMetrics, QColor, QBrush, QPalette
 from qwidget.qt_float_slider import QFloatSlider
 from qwidget.qt_int_slider import QIntegerSlider
 from qwidget.qt_file_string import QFileString
 from qwidget.qt_color_selector import QColorSelector
 from qwidget.qt_vector_spinbox import QIntVectorSpinBox, QFloatVectorSpinBox
+from qwidget.qt_progress_bar import QProgressBarWidget
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParamTypeEnum, HouParamMetaEnum
 from batch_panel import BatchPanel
@@ -21,10 +23,11 @@ class HDAPanel(QWidget):
     _batch_parms_value = {}
     _hda_name = ""
 
-    def __init__(self, model):
+    def __init__(self, model, controller):
         super().__init__()
-        self.initUI()
         self._model = model
+        self._controller = controller
+        self.initUI()
 
     def initUI(self):
         self.layout = QVBoxLayout(self)
@@ -32,6 +35,22 @@ class HDAPanel(QWidget):
         # HDA name
         hda_name = QLabel(getLocalizationStr(LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA))
         self.layout.addWidget(hda_name)
+        self.progress_bar = QProgressBarWidget()
+        # progress bar timer, only display progress bar after waiting for more than 2 sec
+        self.progress_bar_timer = QTimer()
+        self.progress_bar_timer.setInterval(1000)
+        self.progress_bar_timer.setSingleShot(True)
+        self.progress_bar_timer.timeout.connect(self.progress_bar.show)
+        self._controller.cook_started.connect(self.displayProgressBar)
+        self._controller.cook_finished.connect(self.hideProgressBar)
+
+    def displayProgressBar(self):
+        self.progress_bar.geometry().moveCenter(self.geometry().center())
+        self.progress_bar.refreshTime()
+        self.progress_bar_timer.start()
+
+    def hideProgressBar(self):
+        self.progress_bar.hide()
 
     def clearHDAData(self):
         self._parms_widget = {}

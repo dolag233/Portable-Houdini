@@ -5,6 +5,7 @@ SETTINGS_MANAGER = SettingsManager()
 
 LANGUAGE = LANG_ENUM.ZH_CN
 
+APP = None
 
 def setLanguage(language_idx):
     global LANGUAGE
