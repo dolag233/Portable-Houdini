@@ -15,7 +15,7 @@ class HouParamTypeEnum(SimpleEnum):
     INT_ARRAY = None
     TOGGLE = None
     BUTTON = None
-    # RAMP = None  # not support
+    RAMP = None
     COMBOX = None
     COLOR = None  # 注意，color有RGB和RGBA两种
 
@@ -87,6 +87,11 @@ class HouParmsModel(QObject):
             parm_help = parm_tuple.parmTemplate().help()
             parm_range = None
             parm_combox = None
+            parm_ramp = None
+            # this parm is a sub item of some host item like vector, ramp
+            if parm_tuple.isMultiParmInstance():
+                continue
+
             if isinstance(parm_temp, hou.StringParmTemplate):
                 if parm_temp.stringType() == hou.stringParmType.FileReference:
                     parm_type = HouParamTypeEnum.FILE_STRING
@@ -147,6 +152,12 @@ class HouParmsModel(QObject):
                 parm_combox.labels = parm_temp.menuLabels()
                 parm_value = parm_tuple.eval()[0]
 
+            # ramp
+            elif isinstance(parm_temp, hou.RampParmTemplate):
+                parm_type = HouParamTypeEnum.RAMP
+                parm_value = parm_tuple.eval()[0]
+                parm_value = {'keys': parm_value.keys(), 'values': parm_value.values(), 'basis': parm_value.basis()}
+
             parm_meta = HouParmMetadata()
             if parm_type:
                 parm_meta.setData(parm_tuple.name(), parm_label, parm_type, parm_value, parm_help, parm_tuple)
@@ -155,6 +166,10 @@ class HouParmsModel(QObject):
 
                 if parm_combox is not None:
                     parm_meta.setDataSpecific(HouParamMetaEnum.COMBOX_DEFINE, parm_combox)
+
+                if parm_ramp is not None:
+                    parm_meta.setDataSpecific(HouParamMetaEnum.RAMP_DEFINE, parm_ramp)
+
                 self.parms.append(parm_meta)
 
     def getParms(self):

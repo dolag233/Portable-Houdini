@@ -9,6 +9,7 @@ from qwidget.qt_file_string import QFileString
 from qwidget.qt_color_selector import QColorSelector
 from qwidget.qt_vector_spinbox import QIntVectorSpinBox, QFloatVectorSpinBox
 from qwidget.qt_progress_bar import QProgressBarWidget
+from qwidget.qt_ramp import QRampWidget
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParamTypeEnum, HouParamMetaEnum
 from batch_panel import BatchPanel
@@ -157,6 +158,17 @@ class HDAPanel(QWidget):
                     parm_ui.addItems(labels)
                     parm_ui.setCurrentIndex(parm_value)
                     parm_ui.currentIndexChanged.connect(partial(self.updateParm, parm_name))
+
+                elif parm_type == HouParamTypeEnum.RAMP:
+                    parm_ui = QRampWidget()
+                    parm_ui.ramp_widget.clearPoints()
+                    points = zip(parm_value["keys"], parm_value["values"])
+                    for point in points:
+                        parm_ui.ramp_widget.addPointFromPos(*point)
+
+                    basis = parm_value["basis"][0]
+                    parm_ui.setInterpolationModeFromBasis(basis)
+                    parm_ui.ramp_widget.edit_finished.connect(partial(self.updateParm, parm_name))
 
                 if parm_ui is not None:
                     self._parms_widget[parm_name] = parm_ui

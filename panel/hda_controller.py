@@ -90,7 +90,6 @@ class HDAController(QObject):
 
     def writeHDAProperty(self, parm_meta):
         self.cook_started.emit()
-
         start_time = time.time()
         parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
         parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
@@ -110,6 +109,12 @@ class HDAController(QObject):
             assert len(re_val) == len(parm_value)
             parm_tuple_ref.set(parm_value)
             print('change parm "{}" value to {}'.format(parm_name, parm_value))
+
+        elif parm_type == HouParamTypeEnum.RAMP:
+            import hou
+            new_ramp = hou.Ramp(parm_value["basis"], parm_value["keys"], parm_value["values"])
+            parm_tuple_ref[0].set(new_ramp)
+            print('change ramp "{}" value to {}'.format(parm_name, new_ramp))
 
         else:
             # 因为是parm tuple, 所以要设置tuple值

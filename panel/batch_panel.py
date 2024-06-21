@@ -13,6 +13,7 @@ from qwidget.qt_float_slider import QFloatSlider
 from qwidget.qt_file_string import QFileString
 from qwidget.qt_int_slider import QIntegerSlider
 from qwidget.qt_color_selector import QColorSelector
+from qwidget.qt_ramp import QRampWidget, QRamp
 from functools import partial
 
 class BatchPanel(QDialog):
@@ -152,6 +153,16 @@ class BatchPanel(QDialog):
             parm_ui.addItems(labels)
             parm_ui.setCurrentIndex(parm_value if value is None else value)
 
+        elif parm_type == HouParamTypeEnum.RAMP:
+            parm_ui = QRampWidget()
+            parm_ui.ramp_widget.clearPoints()
+            points = zip(parm_value["keys"], parm_value["values"]) if value is None else zip(value["keys"], value["values"])
+            for point in points:
+                parm_ui.ramp_widget.addPointFromPos(*point)
+
+            basis = parm_value["basis"][0] if value is None else value["basis"]
+            parm_ui.setInterpolationModeFromBasis(basis)
+
         return parm_ui
 
     def getFirstColumnItem(self, row_count):
@@ -185,7 +196,11 @@ class BatchPanel(QDialog):
         # 设置行高
         original_height = self.table_widget.rowHeight(row_count - 1)
         new_height = original_height * 1.5
+        if self._parm_meta.getData(HouParamMetaEnum.TYPE) == HouParamTypeEnum.RAMP:
+            new_height = 100
+
         self.table_widget.setRowHeight(row_count - 1, new_height)
+        self.table_widget.setRowHeight(row_count, new_height)
 
     def removeRow(self):
         selected_items = self.table_widget.selectedItems()
@@ -235,6 +250,8 @@ class BatchPanel(QDialog):
                     parm_value = widget.currentIndex()
                 elif parm_type == HouParamTypeEnum.STRING or parm_type == HouParamTypeEnum.FILE_STRING:
                     parm_value = widget.text()
+                elif parm_type == HouParamTypeEnum.RAMP:
+                    parm_value = widget.ramp_widget.getHouRampParms()
             batches_value.append(parm_value)
 
         return batches_value
