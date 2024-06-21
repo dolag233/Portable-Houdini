@@ -61,9 +61,9 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 - [x] 支持文件批处理
 - [x] 支持自动Recook开关
 - [ ] 支持(几乎)全部变量类型
-- [ ] 支持ToolTips
+- [x] 支持ToolTips
 - [ ] 支持变量禁用和隐藏
-- [ ] 支持进度条显示
+- [x] 支持进度条显示
 - [ ] 支持设置主题色
 - [ ] 支持简单属性窗口文件夹
 - [ ] 支持前后端数据双向同步(支持表达式)
@@ -130,8 +130,8 @@ The total number of batches is displayed at the bottom left of the HDA parameter
 - [x] Support batch file processing
 - [x] Support auto Recook toggle
 - [ ] Support (almost) all variable types
-- [ ] Support ToolTips
-- [ ] Support variable disabling and hiding
+- [x] Support ToolTips
+- [x] Support variable disabling and hiding
 - [ ] Support progress bar display
 - [ ] Support theme color settings
 - [ ] Support simple property window folders

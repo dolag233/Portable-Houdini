@@ -86,6 +86,7 @@ class HDAPanel(QWidget):
                 parm_value = parm_meta.getData(HouParamMetaEnum.VALUE)
                 parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
                 parm_label = parm_meta.getData(HouParamMetaEnum.LABEL)
+                parm_help = parm_meta.getData(HouParamMetaEnum.HELP)
                 parm_range = parm_meta.getData(HouParamMetaEnum.VALUE_RANGE)
                 parm_combox = parm_meta.getData(HouParamMetaEnum.COMBOX_DEFINE)
                 parm_ui = None
@@ -161,7 +162,11 @@ class HDAPanel(QWidget):
                     self._parms_widget[parm_name] = parm_ui
                     # button不需要label
                     if parm_type != HouParamTypeEnum.BUTTON:
+                        parm_label_ui.setToolTip(parm_help)
                         parm_layout.addWidget(parm_label_ui)
+                    else:
+                        parm_ui.setToolTip(parm_help)
+
                     parm_layout.addWidget(parm_ui)
 
                     # 批处理按钮

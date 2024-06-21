@@ -29,6 +29,7 @@ class HouParamMetaEnum(SimpleEnum):
     VALUE_RANGE = None
     COMBOX_DEFINE = None  # {'name': , 'label': }
     DESCRIPTION = None
+    HELP = None
     PARM_TUPLE_REF = None
     END = None
 
@@ -39,14 +40,14 @@ class HouParmCombox():
 class HouParmMetadata():
     meta = {}
 
-    def setData(self, parm_name, parm_label, parm_type_enum, parm_value=None, parm_description='', parm_ref=None):
+    def setData(self, parm_name, parm_label, parm_type_enum, parm_value=None, parm_help='', parm_ref=None):
         meta = {}
         meta[HouParamMetaEnum.NAME] = parm_name
         meta[HouParamMetaEnum.LABEL] = parm_label
         meta[HouParamMetaEnum.TYPE] = parm_type_enum
         meta[HouParamMetaEnum.VALUE] = parm_value
         meta[HouParamMetaEnum.PARM_TUPLE_REF] = parm_ref
-        meta[HouParamMetaEnum.DESCRIPTION] = parm_description
+        meta[HouParamMetaEnum.HELP] = parm_help
         self.meta = meta
 
     def setDataSpecific(self, parm_meta_enum, value):
@@ -83,7 +84,7 @@ class HouParmsModel(QObject):
             parm_label = parm_temp.label()
             parm_type = None
             parm_value = None
-            parm_description = parm_tuple.description()
+            parm_help = parm_tuple.parmTemplate().help()
             parm_range = None
             parm_combox = None
             if isinstance(parm_temp, hou.StringParmTemplate):
@@ -148,7 +149,7 @@ class HouParmsModel(QObject):
 
             parm_meta = HouParmMetadata()
             if parm_type:
-                parm_meta.setData(parm_tuple.name(), parm_label, parm_type, parm_value, parm_description, parm_tuple)
+                parm_meta.setData(parm_tuple.name(), parm_label, parm_type, parm_value, parm_help, parm_tuple)
                 if parm_range is not None:
                     parm_meta.setDataSpecific(HouParamMetaEnum.VALUE_RANGE, parm_range)
 
