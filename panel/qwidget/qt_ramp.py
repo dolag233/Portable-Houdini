@@ -26,9 +26,20 @@ class QRamp(QWidget):
     def setInterpolationModeFromBasis(self, basis):
         import hou
         interpolation = "Linear"
-        if basis == hou.rampBasis.Linear:
+        if basis == hou.rampBasis.Constant:
+            interpolation = "Constant"
+        elif basis == hou.rampBasis.Linear:
             interpolation = "Linear"
         elif basis == hou.rampBasis.CatmullRom:
+            interpolation = "Catmull-Rom"
+        elif basis == hou.rampBasis.MonotoneCubic:
+            interpolation = "MonotoneCubic"
+        elif basis == hou.rampBasis.Bezier:
+            interpolation = "Bezier"
+        elif basis == hou.rampBasis.BSpline:
+            interpolation = "BSpline"
+        elif basis == hou.rampBasis.Hermite:  # not support
+            # interpolation = "Hermite"
             interpolation = "Catmull-Rom"
         self.setInterpolationMode(interpolation)
 
@@ -100,13 +111,6 @@ class QRamp(QWidget):
                 return sample_points[i].y() * (1 - ratio) + sample_points[i + 1].y() * ratio
 
         return ValueError(f"Unexpected posx: {posx}")
-
-    def getInterpolatedPoints(self):
-        if self.interpolation_mode == 'Linear':
-            return self.points
-        elif self.interpolation_mode == 'Catmull-Rom':
-            return self.catmullRomInterpolation()
-        return self.points
 
     def mapToScene(self, point):
         x = point.x() * self.width()
@@ -191,6 +195,106 @@ class QRamp(QWidget):
         interp_points.append(self.points[-1])
         return interp_points
 
+    def bezierInterpolation(self):
+        def bezier(p0, p1, p2, p3, t):
+            return (1 - t)**3 * p0 + 3 * (1 - t)**2 * t * p1 + 3 * (1 - t) * t**2 * p2 + t**3 * p3
+
+        interp_points = []
+        n = len(self.points)
+        for i in range(0, n, 3):
+            p0 = self.points[i]
+            p1 = self.points[min(i + 1, n - 1)]
+            p2 = self.points[min(i + 2, n - 1)]
+            p3 = self.points[min(i + 3, n - 1)]
+
+            for t in range(20):
+                t /= 20
+                x = bezier(p0.x(), p1.x(), p2.x(), p3.x(), t)
+                y = bezier(p0.y(), p1.y(), p2.y(), p3.y(), t)
+                interp_points.append(QPointF(x, y))
+        return interp_points
+
+    def bSplineInterpolation(self):
+        points = self.points
+        def bSpline(t, p0, p1, p2, p3):
+            return (1 / 6) * ((1 - t) ** 3 * p0 + (4 - 6 * t ** 2 + 3 * t ** 3) * p1 + (
+                        1 + 3 * t + 3 * t ** 2 - 3 * t ** 3) * p2 + t ** 3 * p3)
+
+        interp_points = []
+        n = len(points)
+        for i in range(n - 1):
+            p0 = points[max(0, i - 1)]
+            p1 = points[i]
+            p2 = points[min(i + 1, n - 1)]
+            p3 = points[min(i + 2, n - 1)]
+
+            for t in range(20):
+                t /= 20
+                x = bSpline(t, p0.x(), p1.x(), p2.x(), p3.x())
+                y = bSpline(t, p0.y(), p1.y(), p2.y(), p3.y())
+                interp_points.append(QPointF(x, y))
+        interp_points.append(points[-1])
+        return interp_points
+
+    def monotoneCubicInterpolation(self):
+        points = self.points
+        def cubicHermite(p0, m0, p1, m1, t):
+            t2 = t * t
+            t3 = t2 * t
+            return (2 * t3 - 3 * t2 + 1) * p0 + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * p1 + (t3 - t2) * m1
+
+        def computeTangents(points):
+            n = len(points)
+            tangents = [0] * n
+            for i in range(1, n - 1):
+                tangents[i] = (points[i + 1].y() - points[i - 1].y()) / (points[i + 1].x() - points[i - 1].x())
+            tangents[0] = tangents[1]
+            tangents[-1] = tangents[-2]
+            return tangents
+
+        interp_points = []
+        n = len(points)
+        tangents = computeTangents(points)
+        for i in range(n - 1):
+            p0 = points[i]
+            p1 = points[i + 1]
+            m0 = tangents[i] * (p1.x() - p0.x())
+            m1 = tangents[i + 1] * (p1.x() - p0.x())
+
+            for t in range(20):
+                t /= 20
+                x = p0.x() + t * (p1.x() - p0.x())
+                y = cubicHermite(p0.y(), m0, p1.y(), m1, t)
+                interp_points.append(QPointF(x, y))
+        interp_points.append(points[-1])
+        return interp_points
+
+    def constantInterpolation(self):
+        points = self.points
+        interp_points = []
+        for i in range(len(points) - 1):
+            interp_points.append(points[i])
+            interp_points.append(QPointF(points[i + 1].x(), points[i].y()))
+        interp_points.append(points[-1])
+        return interp_points
+
+    def getInterpolatedPoints(self):
+        if self.interpolation_mode == 'Linear':
+            return self.points
+        elif self.interpolation_mode == 'Catmull-Rom':
+            return self.catmullRomInterpolation()
+        elif self.interpolation_mode == 'Bezier':
+            return self.bezierInterpolation()
+        elif self.interpolation_mode == 'BSpline':
+            return self.bSplineInterpolation()
+        elif self.interpolation_mode == 'MonotoneCubic':
+            return self.monotoneCubicInterpolation()
+        elif self.interpolation_mode == 'Constant':
+            return self.constantInterpolation()
+        # elif self.interpolation_mode == 'Hermite':
+        #     return self.hermiteInterpolation()
+        return self.points
+
     def getHouRampParms(self):
         import hou
         keys = [p.x() for p in self.points]
@@ -213,7 +317,8 @@ class QRampWidget(QWidget):
         self.layout.addWidget(self.ramp_widget)
 
         self.interp_combo = QComboBox()
-        self.interp_combo.addItems(['Linear', 'Catmull-Rom'])
+        self.interp_combo.addItems(['Constant', 'Linear', 'Catmull-Rom', 'MonotoneCubic', 'Bezier', 'BSpline'])
+        self.interp_combo.setCurrentText('Catmull-Rom')
         self.interp_combo.currentTextChanged.connect(self.ramp_widget.setInterpolationMode)
         self.ramp_widget.setInterpolationMode(self.interp_combo.currentText())
         self.layout.addWidget(self.interp_combo)
@@ -221,9 +326,20 @@ class QRampWidget(QWidget):
     def setInterpolationModeFromBasis(self, basis):
         import hou
         interpolation = "Linear"
-        if basis == hou.rampBasis.Linear:
+        if basis == hou.rampBasis.Constant:
+            interpolation = "Constant"
+        elif basis == hou.rampBasis.Linear:
             interpolation = "Linear"
         elif basis == hou.rampBasis.CatmullRom:
+            interpolation = "Catmull-Rom"
+        elif basis == hou.rampBasis.MonotoneCubic:
+            interpolation = "MonotoneCubic"
+        elif basis == hou.rampBasis.Bezier:
+            interpolation = "Bezier"
+        elif basis == hou.rampBasis.BSpline:
+            interpolation = "BSpline"
+        elif basis == hou.rampBasis.Hermite:  # not support
+            # interpolation = "Hermite"
             interpolation = "Catmull-Rom"
         self.interp_combo.setCurrentText(interpolation)
 
