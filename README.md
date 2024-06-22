@@ -1,6 +1,10 @@
-[![中文](https://img.shields.io/badge/lang-中文-blue.svg)](#简介) [![English](https://img.shields.io/badge/lang-English-red.svg)](#Introduction)
+<div style="text-align: center">
+<img src="E:\Repositories\PortableHoudini\icon.png" alt="icon" style="zoom:33%;" />
+</div>
 
 # Portable Houdini
+
+[![中文](https://img.shields.io/badge/lang-中文-blue.svg)](#简介) [![English](https://img.shields.io/badge/lang-English-red.svg)](#Introduction)
 
 ## 简介
 
@@ -68,6 +72,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 - [ ] 支持简单属性窗口文件夹
 - [ ] 支持前后端数据双向同步(支持表达式)
 - [ ] 支持模型预览
+- [ ] 客户端服务端分离
 
 ---
 
