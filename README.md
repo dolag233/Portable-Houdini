@@ -1,5 +1,5 @@
-<div style="text-align: center">
-<img src="icon.png" alt="icon" style="zoom:33%;" />
+<div align="center">
+  <img src="icon.png" width="40%">
 </div>
 
 # Portable Houdini
