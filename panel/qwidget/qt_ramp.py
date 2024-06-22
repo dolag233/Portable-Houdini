@@ -38,7 +38,7 @@ class QRamp(QWidget):
 
         # 绘制背景
         palette = self.palette()
-        bg_color = color = palette.color(QPalette.Background)
+        bg_color = palette.color(QPalette.Background)
         painter.setBrush(QBrush(bg_color))
         painter.drawRect(self.rect())
 
@@ -55,13 +55,13 @@ class QRamp(QWidget):
             fill_points.append(QPointF(1, 0))
 
             path.moveTo(self.mapToScene(fill_points[0]))
-            fill_path.moveTo(self.width() * 0.05, self.height() * 0.95)
+            fill_path.moveTo(self.mapToScene(fill_points[0]))
 
             for point in fill_points:
                 path.lineTo(self.mapToScene(point))
                 fill_path.lineTo(self.mapToScene(point))
 
-            fill_path.lineTo(self.width() * 0.95, self.height() * 0.95)
+            fill_path.lineTo(self.mapToScene(QPointF(1, 0)))
             painter.setBrush(QBrush(QColor(200, 200, 200)))
             painter.drawPath(fill_path)
 
@@ -75,8 +75,8 @@ class QRamp(QWidget):
 
         # 绘制XY轴
         painter.setPen(QPen(QColor(Qt.darkGray), 1))
-        painter.drawLine(self.width() * 0.05, self.height() * 0.95, self.width() * 0.95, self.height() * 0.95)
-        painter.drawLine(self.width() * 0.05, self.height() * 0.95, self.width() * 0.05, self.height() * 0.05)
+        painter.drawLine(self.mapToScene(QPointF(0, 0)), self.mapToScene(QPointF(1, 0)))
+        painter.drawLine(self.mapToScene(QPointF(0, 0)), self.mapToScene(QPointF(0, 1)))
 
     def sampleRamp(self, posx):
         if not self.points:
@@ -109,13 +109,13 @@ class QRamp(QWidget):
         return self.points
 
     def mapToScene(self, point):
-        x = self.width() * 0.05 + point.x() * (self.width() * 0.9)
-        y = self.height() * 0.95 - point.y() * (self.height() * 0.9)
+        x = point.x() * self.width()
+        y = (1 - point.y()) * self.height()
         return QPointF(x, y)
 
     def mapFromScene(self, point):
-        x = (point.x() - self.width() * 0.05) / (self.width() * 0.9)
-        y = (self.height() * 0.95 - point.y()) / (self.height() * 0.9)
+        x = point.x() / self.width()
+        y = 1 - point.y() / self.height()
         return QPointF(x, y)
 
     def mousePressEvent(self, event):
