@@ -66,3 +66,8 @@ class FileMenu(QMenu):
                 self.load_hda.emit(file_path, file_name)
             elif ".hip" in file_path:
                 self.load_hip.emit(file_path, file_name)
+
+            SETTINGS_MANAGER.appendRecentFiles(file_path)
+            SETTINGS_MANAGER.saveSettings()
+
+            
