@@ -10,6 +10,7 @@ os.environ["QT_PLUGIN_PATH"] = qt_plugin_path
 
 # load qt style
 from PySide2.QtWidgets import QApplication, QMessageBox
+from PySide2.QtGui import QIcon
 import qdarktheme
 qdarktheme.enable_hi_dpi()
 app = QApplication(sys.argv)
@@ -45,5 +46,6 @@ if __name__ == '__main__':
     controller.moveToThread(houdini_thread)  # 现在controller处在单独线程，不会阻塞UI主线程
     houdini_thread.start()
     window = MainWindow(model, controller)
+    window.setWindowIcon(QIcon("icon.png"))
     window.show()
     sys.exit(app.exec_())
