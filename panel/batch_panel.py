@@ -160,7 +160,7 @@ class BatchPanel(QDialog):
             for point in points:
                 parm_ui.ramp_widget.addPointFromPos(*point)
 
-            basis = parm_value["basis"][0] if value is None else value["basis"]
+            basis = parm_value["basis"][0] if value is None else value["basis"][0]
             parm_ui.setInterpolationModeFromBasis(basis)
 
         return parm_ui
@@ -253,7 +253,7 @@ class BatchPanel(QDialog):
                 elif parm_type == HouParamTypeEnum.RAMP:
                     parm_value = widget.ramp_widget.getHouRampParms()
             batches_value.append(parm_value)
-
+        print(batches_value)
         return batches_value
 
     def onApply(self):

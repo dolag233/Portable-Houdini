@@ -304,6 +304,14 @@ class QRamp(QWidget):
             basis = hou.rampBasis.Linear
         elif self.interpolation_mode == "Catmull-Rom":
             basis = hou.rampBasis.CatmullRom
+        elif self.interpolation_mode == "Constant":
+            basis = hou.rampBasis.Constant
+        elif self.interpolation_mode == "Bezier":
+            basis = hou.rampBasis.Bezier
+        elif self.interpolation_mode == "MonotoneCubic":
+            basis = hou.rampBasis.MonotoneCubic
+        elif self.interpolation_mode == "BSpline":
+            basis = hou.rampBasis.BSpline
 
         basis = [basis for _ in range(len(keys))]
         return {"keys": keys, "values": values, "basis": basis}
@@ -342,6 +350,7 @@ class QRampWidget(QWidget):
             # interpolation = "Hermite"
             interpolation = "Catmull-Rom"
         self.interp_combo.setCurrentText(interpolation)
+        self.ramp_widget.setInterpolationMode(self.interp_combo.currentText())
 
 if __name__ == "__main__":
     app = QApplication([])
