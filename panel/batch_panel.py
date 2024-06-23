@@ -194,8 +194,8 @@ class BatchPanel(QDialog):
         self.table_widget.setCellWidget(row_count, 1, second_column_item)
 
         # 设置行高
-        original_height = self.table_widget.rowHeight(row_count - 1)
-        new_height = original_height * 1.5
+        original_height = self.table_widget.rowHeight(row_count)
+        new_height = max(original_height * 1.5, 20)
         if self._parm_meta.getData(HouParamMetaEnum.TYPE) == HouParamTypeEnum.RAMP:
             new_height = 100
 
