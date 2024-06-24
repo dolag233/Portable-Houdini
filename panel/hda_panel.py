@@ -1,3 +1,5 @@
+import time
+
 from PySide2.QtWidgets import (QWidget, QVBoxLayout, QLineEdit, QSlider, QGroupBox, QStyle, QSizePolicy, QToolButton,
                                QSpinBox, QPushButton, QCheckBox, QLabel, QComboBox, QHBoxLayout, QDoubleSpinBox,
                                QProgressBar)
@@ -364,10 +366,13 @@ class HDAPanel(QWidget):
                     # @TODO button需要判断是否需要点击
                 batch_value_dict[parm_name] = parm_value
 
-            self.updateBatchParms(batch_value_dict)
+            #print(batch_value_dict)
             # 先设置参数 后点击按钮
             for button_name in buttons_name:
-                self.updateButtonParm(button_name, update_parms=False)
+                batch_value_dict[button_name] = None
+            self.updateBatchParms(batch_value_dict)
+            # 休眠一瞬间，避免参数覆盖
+            time.sleep(0.01)
 
     # 设置属性批处理值按钮
     def onClickBatchSettingButton(self, parm_name):

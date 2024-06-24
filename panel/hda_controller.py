@@ -1,11 +1,12 @@
 from hou_parms_model import HouParamMetaEnum, HouParamTypeEnum
 from utils.globals import APP
 from qwidget.qt_progress_bar import QProgressBarWidget
-from PySide2.QtCore import QTimer, Qt, Signal, QObject, QThread, Slot
-from functools import partial
-import os
+from PySide2.QtCore import QTimer, Qt, Signal, QObject, QThread
+from queue import Queue
 import threading
 import time
+import os
+import copy
 
 class HDAController(QObject):
     cook_started = Signal()
@@ -22,20 +23,53 @@ class HDAController(QObject):
     def __init__(self, model):
         super().__init__()
         self._model = model
-        self._model.view_data_changed.connect(self.writeHDAProperty)
-        self._model.view_datas_changed.connect(self.writeHDAProperties)
+        self._model.view_data_changed.connect(self.queueWriteHDAProperty)
+        self._model.view_datas_changed.connect(self.queueWriteHDAProperties, Qt.BlockingQueuedConnection)
+
+        self.queue = Queue()
+        self.worker_thread = threading.Thread(target=self.processQueue)
+        self.worker_thread.daemon = True  # Ensure the thread exits when the main program exits
+        self.worker_thread.start()
+
+    def queueWriteHDAProperty(self, parm_meta):
+        parm_meta_data = {
+            'type': parm_meta.getData(HouParamMetaEnum.TYPE),
+            'name': parm_meta.getData(HouParamMetaEnum.NAME),
+            'parm_tuple_ref': parm_meta.getData(HouParamMetaEnum.PARM_TUPLE_REF),
+            'value': parm_meta.getData(HouParamMetaEnum.VALUE)
+        }
+        self.queue.put(("parm", parm_meta_data))
+
+    def queueWriteHDAProperties(self, parm_metas):
+        parm_metas_data = []
+        for parm_meta in parm_metas:
+            parm_meta_data = {
+                'type': parm_meta.getData(HouParamMetaEnum.TYPE),
+                'name': parm_meta.getData(HouParamMetaEnum.NAME),
+                'parm_tuple_ref': parm_meta.getData(HouParamMetaEnum.PARM_TUPLE_REF),
+                'value': parm_meta.getData(HouParamMetaEnum.VALUE)
+            }
+            parm_metas_data.append(parm_meta_data)
+        self.queue.put(("parms", parm_metas_data))
+
+    def processQueue(self):
+        while True:
+            if self.queue.empty():
+                time.sleep(0.5)
+                continue
+            else:
+                process_type, parm_data = self.queue.get()
+                if process_type == "parm":
+                    self.writeHDAProperty(parm_data)
+                elif process_type == "parms":
+                    self.writeHDAProperties(parm_data)
+                self.queue.task_done()
 
     def getCurrentHDAPath(self):
-        if self._CUR_HDA_PATH is not None:
-            return self._CUR_HDA_PATH
-
-        return None
+        return self._CUR_HDA_PATH
 
     def getCurrentHIPPath(self):
-        if self._CUR_HIP_PATH is not None:
-            return self._CUR_HIP_PATH
-
-        return None
+        return self._CUR_HIP_PATH
 
     def checkValid(self):
         return (self._CUR_HDA_PATH is not None) or (self._CUR_HIP_PATH is not None)
@@ -62,7 +96,7 @@ class HDAController(QObject):
         hou.hipFile.clear(suppress_save_prompt=True)
 
     def loadHDA(self):
-        if self._CUR_HDA_PATH is None and os.path.exists(self._CUR_HDA_NAME):
+        if self._CUR_HDA_PATH is None and not os.path.exists(self._CUR_HDA_NAME):
             return False
 
         try:
@@ -71,13 +105,12 @@ class HDAController(QObject):
         except ImportError:
             return
 
-        _cur_hda_def = hou.hda.definitionsInFile(self._CUR_HDA_PATH)[0]
-        # 创建临时hip并创建hda节点
+        self._cur_hda_def = hou.hda.definitionsInFile(self._CUR_HDA_PATH)[0]
         hou.hipFile.clear(suppress_save_prompt=True)
         hou.hda.installFile(self._CUR_HDA_PATH)
         obj_net = hou.node("/obj")
         geo_net = obj_net.createNode("geo", "geo")
-        hda_node = geo_net.createNode(_cur_hda_def.nodeTypeName(), "hda")  # 目前hda的路径是/obj/geo/hda
+        hda_node = geo_net.createNode(self._cur_hda_def.nodeTypeName(), "hda")
         self._cur_hda_node = hda_node
         if self._cur_hda_node is not None and self._model is not None:
             self._model.setHDANode(self._cur_hda_node)
@@ -88,14 +121,15 @@ class HDAController(QObject):
         if self._model is not None:
             self._model.setParmFromController(parm_value, parm_name)
 
-    def writeHDAProperty(self, parm_meta):
+    def writeHDAProperty(self, parm_meta_data):
         self.cook_started.emit()
         start_time = time.time()
-        parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
-        parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
-        parm_tuple_ref = parm_meta.getData(HouParamMetaEnum.PARM_TUPLE_REF)
-        parm_value = parm_meta.getData(HouParamMetaEnum.VALUE)
+        parm_type = parm_meta_data['type']
+        parm_name = parm_meta_data['name']
+        parm_tuple_ref = parm_meta_data['parm_tuple_ref']
+        parm_value = parm_meta_data['value']
         if not parm_tuple_ref:
+            self.cook_finished.emit()
             return
 
         # button不需要赋值，但需要点击
@@ -103,9 +137,8 @@ class HDAController(QObject):
             parm_tuple_ref[0].pressButton()
             print("click button {}".format(parm_name))
 
-        elif parm_type == HouParamTypeEnum.FLOAT_ARRAY or parm_type == HouParamTypeEnum.INT_ARRAY or\
-            parm_type == HouParamTypeEnum.COLOR:
-            re_val = parm_meta.getData(HouParamMetaEnum.VALUE)
+        elif parm_type in (HouParamTypeEnum.FLOAT_ARRAY, HouParamTypeEnum.INT_ARRAY, HouParamTypeEnum.COLOR):
+            re_val = parm_value
             assert len(re_val) == len(parm_value)
             parm_tuple_ref.set(parm_value)
             print('change parm "{}" value to {}'.format(parm_name, parm_value))
@@ -117,23 +150,26 @@ class HDAController(QObject):
             print('change ramp "{}" value to {}'.format(parm_name, new_ramp))
 
         else:
-            # 因为是parm tuple, 所以要设置tuple值
             parm_tuple_ref.set((parm_value,))
             print('change parm "{}" value to {}'.format(parm_name, parm_value))
 
         print("use time: {}".format(time.time() - start_time))
         self.cook_finished.emit()
 
-    def writeHDAProperties(self, parm_metas):
+    def writeHDAProperties(self, parm_metas_data):
         import hou
         hou.setUpdateMode(hou.updateMode.Manual)
 
-        for parm_meta in parm_metas:
-            # force recook的时候并不会点击所有的按钮。但是如果是这样，那么force recook有什么用呢
-            if parm_meta.getData(HouParamMetaEnum.TYPE) != HouParamTypeEnum.BUTTON:
-                self.writeHDAProperty(parm_meta)
+        for parm_meta_data in parm_metas_data:
+            if parm_meta_data['type'] != HouParamTypeEnum.BUTTON:
+                self.writeHDAProperty(parm_meta_data)
 
         self._cur_hda_node.cook()
+
+        for parm_meta_data in parm_metas_data:
+            if parm_meta_data['type'] == HouParamTypeEnum.BUTTON:
+                self.writeHDAProperty(parm_meta_data)
+
         hou.setUpdateMode(hou.updateMode.AutoUpdate)
 
     def unloadHDA(self):
@@ -143,4 +179,3 @@ class HDAController(QObject):
         self._CUR_HIP_NAME = None
         self._cur_hda_def = None
         self._cur_hda_node = None
-
