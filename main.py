@@ -9,33 +9,23 @@ os.environ["path"] += os.path.join(qt_plugin_path, "platforms")
 os.environ["QT_PLUGIN_PATH"] = qt_plugin_path
 
 # load qt style
+from panel.utils import globals
 from PySide2.QtWidgets import QApplication, QMessageBox
 from PySide2.QtGui import QIcon
-import qdarktheme
-qdarktheme.enable_hi_dpi()
+from panel.utils.theme import Theme
+theme = Theme()
 app = QApplication(sys.argv)
-# stylesheet = load_stylesheet(qtvsc.Theme.LIGHT_VS)
-additional_qss = """
-QToolTip {
-    color: silver; /* 字体颜色 */
-    background-color: #08101F; /* 背景颜色 */
-    border: 1px solid white;
-}
-"""
-qdarktheme.setup_theme("auto", additional_qss=additional_qss)
-
 from panel.main_panel import MainWindow
 from panel.hou_parms_model import HouParmsModel
 from panel.hda_controller import HDAController
 from panel.utils.settings_manager import SettingsEnum, SettingsManager
 from panel.utils.localization import LANG_STR_ENUM, getLocalizationStr
-from panel.utils import globals
 from PySide2.QtCore import QThread
 globals.APP = app
 
 if __name__ == '__main__':
     # check if houdini_path is valid
-    globals.SETTINGS_MANAGER.loadSettings()
+    theme.setTheme()
     if not os.path.isdir(globals.SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)):
         msg_box = QMessageBox(QMessageBox.Warning, getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH), getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH_SETTINGS))
         msg_box.exec_()

@@ -3,9 +3,9 @@ class SimpleEnumMetaClass(type):
         cls = super().__new__(metacls, name, bases, class_dict)
         cls._value_map = {}
         cls._name_map = {}
-        value = 1
+        value = 0
         for key in class_dict:
-            if not key.startswith('_'):
+            if not key.startswith('_') and not callable(class_dict[key]):
                 setattr(cls, key, value)
                 cls._value_map[value] = key
                 cls._name_map[key] = value

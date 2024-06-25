@@ -21,7 +21,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
    + 从官网下载对应版本的Python安装器，例如[Windows x86-64 executable installer](https://www.python.org/ftp/python/3.9.0/python-3.9.0-amd64.exe)。
    + 使用安装器安装。
-   + 将安装器安装的Python环境复制到venv文件下，并重命名为Python37或Python39。Python安装器默认的安装路径为**C:\Users\UserName\AppData\Local\Programs\Python\Pythonxx**。
+   + 将安装器安装的Python环境复制到`venv`文件下，并重命名为`Python37`或`Python39`。Python安装器默认的安装路径为**C:\Users\UserName\AppData\Local\Programs\Python\Pythonxx**。
 
 2. 安装依赖。使用如下代码安装所需模块:
 
@@ -35,7 +35,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
    python main.py
    ```
 
-   若在步骤1中在venv文件夹下创建了Python37或Python39环境，那么可以直接双击*run_py37.bat*文件运行。
+   若在步骤1中在`venv`文件夹下创建了`Python37`或`Python39`环境，那么可以直接双击*run_py37.bat*文件运行。
 
 ## 使用方法
 
@@ -68,7 +68,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 - [x] 支持ToolTips
 - [ ] 支持变量禁用和隐藏
 - [x] 支持进度条显示
-- [ ] 支持设置主题色
+- [x] 支持设置主题色
 - [ ] 支持简单属性窗口文件夹
 - [ ] 支持前后端数据双向同步(支持表达式)
 - [ ] 支持模型预览
@@ -91,7 +91,7 @@ Please note, although there is no need to open Houdini, it still needs to be ins
 
    + Download the appropriate version of the Python installer from the official website, such as the [Windows x86-64 executable installer](https://www.python.org/ftp/python/3.9.0/python-3.9.0-amd64.exe).
    + Install Python using the installer.
-   + Copy the installed Python environment to the `venv` directory and rename it to `Python37` or `Python39`. The default installation path for the Python installer is **C:\Users\UserName\AppData\Local\Programs\Python\Pythonxx**.
+   + Copy the installed Python environment to the `venv` directory and rename it to`Python37` or `Python39`. The default installation path for the Python installer is **C:\Users\UserName\AppData\Local\Programs\Python\Pythonxx**.
 
 2. Install dependencies. Use the following command to install the required modules:
 
@@ -136,9 +136,9 @@ The total number of batches is displayed at the bottom left of the HDA parameter
 - [x] Support auto Recook toggle
 - [x] Support (almost) all variable types
 - [x] Support ToolTips
-- [x] Support variable disabling and hiding
-- [ ] Support progress bar display
-- [ ] Support theme color settings
+- [ ] Support variable disabling and hiding
+- [x] Support progress bar display
+- [x] Support theme color settings
 - [ ] Support simple property window folders
 - [ ] Support bidirectional front-end and back-end data synchronization (support expressions)
 - [ ] Support model preview

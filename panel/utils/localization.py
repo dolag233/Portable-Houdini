@@ -1,8 +1,5 @@
 from simple_enum import SimpleEnum
-
-class LANG_ENUM(SimpleEnum):
-    ZH_CN = None
-    EN_US = None
+from panel.utils.language_enum import LANG_ENUM
 
 
 class LANG_STR_ENUM(SimpleEnum):
@@ -62,9 +59,9 @@ LANG_MAP = {LANG_STR_ENUM.UI_APPLY: {LANG_ENUM.EN_US: "Apply", LANG_ENUM.ZH_CN: 
             LANG_STR_ENUM.UI_MENU_SETTINGS_SAVE: {LANG_ENUM.EN_US: "Save Settings", LANG_ENUM.ZH_CN: "保存设置"},
             LANG_STR_ENUM.UI_MENU_SETTINGS_GENERAL: {LANG_ENUM.EN_US: "General Settings", LANG_ENUM.ZH_CN: "常规设置"},
             LANG_STR_ENUM.UI_MENU_SETTINGS_HOUDINI_ROOT: {LANG_ENUM.EN_US: "Houdini Root", LANG_ENUM.ZH_CN: "Houdini根目录"},
-            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE: {LANG_ENUM.EN_US: "Language", LANG_ENUM.ZH_CN: "语言"},
-            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_EN_US: {LANG_ENUM.EN_US: "English", LANG_ENUM.ZH_CN: "英文"},
-            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_ZH_CN: {LANG_ENUM.EN_US: "Chinese", LANG_ENUM.ZH_CN: "中文"},
+            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE: {LANG_ENUM.EN_US: "Language (Restart required)", LANG_ENUM.ZH_CN: "语言(重启生效)"},
+            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_EN_US: {LANG_ENUM.EN_US: "English", LANG_ENUM.ZH_CN: "English"},
+            LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_ZH_CN: {LANG_ENUM.EN_US: "中文", LANG_ENUM.ZH_CN: "中文"},
             LANG_STR_ENUM.UI_HDAPANEL_EMPTY_HDA: {LANG_ENUM.EN_US: "Select a HDA", LANG_ENUM.ZH_CN: "打开一个HDA"},
             LANG_STR_ENUM.UI_HDAPANEL_AUTO_RECOOK: {LANG_ENUM.EN_US: "Auto Recook", LANG_ENUM.ZH_CN: "自动计算"},
             LANG_STR_ENUM.UI_HDAPANEL_FORCE_RECOOK: {LANG_ENUM.EN_US: "Force Recook", LANG_ENUM.ZH_CN: "强制重新计算"},

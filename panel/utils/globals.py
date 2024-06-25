@@ -1,15 +1,12 @@
-from language_enum import LANG_ENUM
+"""
+    Load globals before any widget
+"""
 
-from settings_manager import SettingsManager, SettingsEnum
+from panel.utils.language_enum import *
+from panel.utils.settings_manager import SettingsManager, SettingsEnum
+
 SETTINGS_MANAGER = SettingsManager()
 
-LANGUAGE = LANG_ENUM.ZH_CN
+LANGUAGE = LangStrToEnum(SETTINGS_MANAGER.get(SettingsEnum.LANGUAGE))
 
 APP = None
-
-def setLanguage(language_idx):
-    global LANGUAGE
-    if language_idx == 0:
-        LANGUAGE = LANG_ENUM.ZH_CN
-    elif language_idx == 1:
-        LANGUAGE = LANG_ENUM.EN_US

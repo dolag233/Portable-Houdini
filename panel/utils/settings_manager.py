@@ -1,42 +1,44 @@
 import json
 import os
 import platform
-from language_enum import LANG_ENUM
+from panel.utils.language_enum import *
 
 
-class SettingsEnum():
+class SettingsEnum:
     HOUDINI_PATH = "HOUDINI_PATH"
     LANGUAGE = "LANGUAGE"
     RECENT = "RECENT"
+    THEME = "THEME"
 
-
-LANG_MAP = {
-    LANG_ENUM.EN_US: ("en_us", 0),
-    LANG_ENUM.ZH_CN: ("zh_cn", 1)
-}
 
 MAX_RECENT = 8
 
-def getSettingsLanguageKeyIndex(lang_idx):
-    if lang_idx in LANG_MAP:
-        return LANG_MAP[lang_idx]
-    return LANG_MAP[LANG_ENUM.ZH_CN]
+
+class SingletonMeta(type):
+    """
+    A metaclass that creates a Singleton base type when called.
+    """
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super(SingletonMeta, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
 
 
-class SettingsManager:
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(SettingsManager, cls).__new__(cls)
-            cls._instance._settings = {
+class SettingsManager(metaclass=SingletonMeta):
+    def __init__(self):
+        if not hasattr(self, '_initialized'):
+            self._settings = {
                 SettingsEnum.HOUDINI_PATH: "",
-                SettingsEnum.LANGUAGE: "zh_cn",
-                SettingsEnum.RECENT: []
+                SettingsEnum.LANGUAGE: LangEnumToStr(LANG_ENUM.EN_US),
+                SettingsEnum.RECENT: [],
+                SettingsEnum.THEME: "auto"
             }
-            cls._instance._file_path = cls._instance._getSettingsFilePath()
-            cls._instance.loadSettings()
-        return cls._instance
+            self._file_path = self._getSettingsFilePath()
+            self.loadSettings()
+            self._initialized = True
 
     def _getSettingsFilePath(self):
         system = platform.system()
@@ -79,4 +81,3 @@ class SettingsManager:
 
     def __setitem__(self, key, value):
         self.set(key, value)
-
