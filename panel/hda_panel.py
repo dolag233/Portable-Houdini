@@ -260,6 +260,14 @@ class HDAPanel(QWidget):
         self.setVisibility(self.collapse_layout, False)
         self.setVisibility(self.bottom_info_layout, False)
 
+        self.ui_button = QPushButton("ui")
+        self.ui_button.clicked.connect(self.onClickedUIButton)
+        self.layout.addWidget(self.ui_button)
+
+    def onClickedUIButton(self):
+        import hou
+        hou.ui.curDesktop().show()
+
     def toggleButtonLayoutVisibilityFromExpansionButton(self):
         self.toggleVisibility(self.bottom_info_layout)
         self.setVisibility(self.twirl_layout, False)
