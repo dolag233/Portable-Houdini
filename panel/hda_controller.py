@@ -117,6 +117,9 @@ class HDAController(QObject):
 
         return True
 
+    def getCurNode(self):
+        return self._cur_hda_node
+
     def updateHDAProperty(self, parm_value, parm_name):
         if self._model is not None:
             self._model.setParmFromController(parm_value, parm_name)

@@ -12,6 +12,7 @@ from qwidget.qt_color_selector import QColorSelector
 from qwidget.qt_vector_spinbox import QIntVectorSpinBox, QFloatVectorSpinBox
 from qwidget.qt_progress_bar import QProgressBarWidget
 from qwidget.qt_ramp import QRampWidget
+from qwidget.qt_mesh_viewer import QMeshViewer
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParamTypeEnum, HouParamMetaEnum
 from batch_panel import BatchPanel
@@ -260,13 +261,15 @@ class HDAPanel(QWidget):
         self.setVisibility(self.collapse_layout, False)
         self.setVisibility(self.bottom_info_layout, False)
 
-        self.ui_button = QPushButton("ui")
-        self.ui_button.clicked.connect(self.onClickedUIButton)
-        self.layout.addWidget(self.ui_button)
-
-    def onClickedUIButton(self):
-        import hou
-        hou.ui.curDesktop().show()
+    #     self.ui_button = QPushButton("ui")
+    #     self.ui_button.clicked.connect(self.onClickedUIButton)
+    #     self.layout.addWidget(self.ui_button)
+    #
+    # def onClickedUIButton(self):
+    #     hda_node = self._controller.getCurNode()
+    #     self.mesh_viewer = QMeshViewer()
+    #     self.mesh_viewer.loadHouNodeAsModel(hda_node)
+    #     self.mesh_viewer.show()
 
     def toggleButtonLayoutVisibilityFromExpansionButton(self):
         self.toggleVisibility(self.bottom_info_layout)
