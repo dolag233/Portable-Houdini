@@ -5,14 +5,16 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 sys.path.append(os.path.join(current_dir, "utils"))
 sys.path.append(os.path.join(current_dir, "qwidget"))
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter
 from menu_file import FileMenu
 from menu_settings import SettingsMenu
+from menu_window import WindowMenu
 from hda_panel import HDAPanel
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParmsModel
 from hda_controller import HDAController
 from utils.globals import SETTINGS_MANAGER, SettingsEnum
+from panel.qwidget.qt_mesh_viewer import QMeshViewerPanel, QMeshViewer
 
 
 class MainWindow(QMainWindow):
@@ -38,9 +40,22 @@ class MainWindow(QMainWindow):
         settings_menu = SettingsMenu(self)
         menubar.addMenu(settings_menu)
 
+        window_menu = WindowMenu(self)
+        menubar.addMenu(window_menu)
+        window_menu.open_mesh_viewer.connect(self.onOpenMeshViewer)
+
         # Main widget
+        self.main_widget = QWidget()
+        main_widget_layout = QHBoxLayout()
+        hda_mesh_splitter = QSplitter()
         self.hda_panel = HDAPanel(self._model, self._controller)
-        self.setCentralWidget(self.hda_panel)
+        self.mesh_viewer_panel = QMeshViewerPanel()
+        self.mesh_viewer_panel.hide()
+        hda_mesh_splitter.addWidget(self.hda_panel)
+        hda_mesh_splitter.addWidget(self.mesh_viewer_panel)
+        main_widget_layout.addWidget(hda_mesh_splitter)
+        self.main_widget.setLayout(main_widget_layout)
+        self.setCentralWidget(self.main_widget)
 
         # 打开上一次打开的hda
         if len(SETTINGS_MANAGER.get(SettingsEnum.RECENT)) > 0:
@@ -64,6 +79,15 @@ class MainWindow(QMainWindow):
             self.hda_panel.setHDAName(hda_name)
             self.hda_panel.updateUI()
             self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE) + " - " + hda_name)
+
+    def onOpenMeshViewer(self):
+        if self.mesh_viewer_panel.isHidden():
+            hda_node = self._controller.getCurNode()
+            self.mesh_viewer_panel.mesh_viewer.loadHouNodeAsModel(hda_node)
+            self.mesh_viewer_panel.mesh_viewer.autoMoveCamera()
+            self.mesh_viewer_panel.show()
+        elif self.mesh_viewer_panel.isVisible():
+            self.mesh_viewer_panel.hide()
 
 
 if __name__ == '__main__':

@@ -39,8 +39,9 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 ## 使用方法
 
-1. 初次使用时需要点击**设置>常规设置**以设置Houdini的安装路径。默认安装路径是**C:\Program Files\Side Effects Software\Houdini xx.xx**。
-2. 点击**文件>打开HDA**即可打开HDA文件。点击之后会自动读取并绘制**HDA参数界面**。
+1. 初次使用时需要点击`设置`>`常规设置`以设置Houdini的安装路径。默认安装路径是**C:\Program Files\Side Effects Software\Houdini xx.xx**。
+2. 点击`文件`>`打开HDA`即可打开HDA文件。点击之后会自动读取并绘制**HDA参数界面**。
+3. 点击`窗口`>`模型预览窗口`即可显示或隐藏模型预览窗口。
 
 ### 批处理
 
@@ -72,7 +73,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 - [x] 支持设置主题色
 - [ ] 支持简单属性窗口文件夹
 - [ ] 支持前后端数据双向同步(支持表达式)
-- [ ] 支持模型预览
+- [x] 支持模型预览
 - [ ] 客户端服务端分离
 
 ---
@@ -83,7 +84,7 @@ Portable Houdini is a portable standalone Houdini interface that allows loading 
 
 Please note, although there is no need to open Houdini, it still needs to be installed and activated.
 
-<p align="center"><img src="img/screenshot_0.png" alt="screenshot" style="zoom:75%;" /></p>
+<p align="center"><img src="img/screenshot_0_en.png" alt="screenshot" style="zoom:75%;" /></p>
 
 ## Installation
 
@@ -110,8 +111,9 @@ Please note, although there is no need to open Houdini, it still needs to be ins
 
 ## Usage
 
-1. On first use, you need to click **Settings > General Settings** to set the Houdini installation path. The default installation path is **C:\Program Files\Side Effects Software\Houdini xx.xx**.
-2. Click **File > Open HDA** to open an HDA file. Clicking this will automatically read and render the **HDA parameter interface**.
+1. On first use, you need to click `Settings` > `General Settings` to set the Houdini installation path. The default installation path is **C:\Program Files\Side Effects Software\Houdini xx.xx**.
+2. Click `File `> `Open HDA`to open an HDA file. Clicking this will automatically read and render the **HDA parameter interface**.
+3. Click`Window`>`Mesh Viewer` to display or hide the Mesh Viewer.
 
 ### Batch Processing
 
@@ -143,4 +145,5 @@ The total number of batches is displayed at the bottom left of the HDA parameter
 - [x] Support theme color settings
 - [ ] Support simple property window folders
 - [ ] Support bidirectional front-end and back-end data synchronization (support expressions)
-- [ ] Support model preview
+- [x] Support model preview
+- [ ] Support server and client
