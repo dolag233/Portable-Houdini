@@ -261,15 +261,7 @@ class HDAPanel(QWidget):
         self.setVisibility(self.collapse_layout, False)
         self.setVisibility(self.bottom_info_layout, False)
 
-    #     self.ui_button = QPushButton("ui")
-    #     self.ui_button.clicked.connect(self.onClickedUIButton)
-    #     self.layout.addWidget(self.ui_button)
-    #
-    # def onClickedUIButton(self):
-    #     hda_node = self._controller.getCurNode()
-    #     self.mesh_viewer = QMeshViewer()
-    #     self.mesh_viewer.loadHouNodeAsModel(hda_node)
-    #     self.mesh_viewer.show()
+        self.layout.addStretch()
 
     def toggleButtonLayoutVisibilityFromExpansionButton(self):
         self.toggleVisibility(self.bottom_info_layout)
