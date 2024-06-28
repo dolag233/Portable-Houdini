@@ -11,6 +11,7 @@ import copy
 class HDAController(QObject):
     cook_started = Signal()
     cook_finished = Signal()
+    update_display_model = Signal(list, list, list)  # [vertices, vertex_colors, faces]
     _CUR_HDA_PATH = None
     _CUR_HDA_NAME = None
     _CUR_HIP_PATH = None
@@ -19,6 +20,8 @@ class HDAController(QObject):
     _cur_hda_node = None
     _node_parms = None
     _model = None
+    _last_model_update_time = 0
+    _model_update_interval = 0.005
 
     def __init__(self, model):
         super().__init__()
@@ -30,6 +33,8 @@ class HDAController(QObject):
         self.worker_thread = threading.Thread(target=self.processQueue)
         self.worker_thread.daemon = True  # Ensure the thread exits when the main program exits
         self.worker_thread.start()
+
+        self._last_model_update_time = time.time()
 
     def queueWriteHDAProperty(self, parm_meta):
         parm_meta_data = {
@@ -115,6 +120,7 @@ class HDAController(QObject):
         if self._cur_hda_node is not None and self._model is not None:
             self._model.setHDANode(self._cur_hda_node)
 
+        self.updateNodeModel()
         return True
 
     def getCurNode(self):
@@ -159,6 +165,10 @@ class HDAController(QObject):
         print("use time: {}".format(time.time() - start_time))
         self.cook_finished.emit()
 
+        if time.time() - self._last_model_update_time > self._model_update_interval:
+            self._last_model_update_time = time.time()
+            self.updateNodeModel()
+
     def writeHDAProperties(self, parm_metas_data):
         import hou
         hou.setUpdateMode(hou.updateMode.Manual)
@@ -174,6 +184,42 @@ class HDAController(QObject):
                 self.writeHDAProperty(parm_meta_data)
 
         hou.setUpdateMode(hou.updateMode.AutoUpdate)
+
+    def updateNodeModel(self):
+        vertices = []
+        faces = []
+        vertex_colors = []
+
+        # 读取 Houdini 节点的几何数据
+        geometry = self.getCurNode().geometry()
+        points = geometry.points()
+        polys = geometry.prims()
+
+        # 提取顶点
+        use_default_vertex_color = False
+        if len(points) > 0:
+            if points[0].attribValue("Cd") is None:
+                use_default_vertex_color = True
+                vertex_colors = [(0.5, 0.5, 0.5)] * len(points)
+
+        for point in points:
+            position = point.position()
+            vertices.append((position[0], position[1], position[2]))
+
+            # 提取颜色
+            if not use_default_vertex_color:
+                color = point.attribValue("Cd")
+                vertex_colors.append((color[0], color[1], color[2]))
+
+        # 提取面
+        for poly in polys:
+            poly_vertices = poly.vertices()
+            face = []
+            for vertex in poly_vertices:
+                face.append(vertex.point().number())
+            faces.append(face)
+
+        self.update_display_model.emit(vertices, vertex_colors, faces)
 
     def unloadHDA(self):
         self._CUR_HDA_PATH = None

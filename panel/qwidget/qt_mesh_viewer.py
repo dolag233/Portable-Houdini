@@ -20,6 +20,7 @@ class QMeshViewer(QOpenGLWidget):
         self.setFormat(fmt)
 
         self.vertices = []
+        self.vertex_colors = []
         self.faces = []
         self.vertex_count = 0
         self.face_count = 0
@@ -38,30 +39,6 @@ class QMeshViewer(QOpenGLWidget):
         self.last_mouse_position = None
         self.setMinimumWidth(300)
         self.setMinimumHeight(300)
-        self.loadGeometry()
-
-    def loadGeometry(self):
-        # 示例立方体顶点数据
-        self.vertices = [
-            (-1.0, -1.0, -1.0),
-            (1.0, -1.0, -1.0),
-            (1.0, 1.0, -1.0),
-            (-1.0, 1.0, -1.0),
-            (-1.0, -1.0, 1.0),
-            (1.0, -1.0, 1.0),
-            (1.0, 1.0, 1.0),
-            (-1.0, 1.0, 1.0)
-        ]
-
-        # 立方体的面数据
-        self.faces = [
-            (0, 1, 2, 3),
-            (4, 5, 6, 7),
-            (0, 1, 5, 4),
-            (2, 3, 7, 6),
-            (0, 3, 7, 4),
-            (1, 2, 6, 5)
-        ]
 
         self.vertex_count = len(self.vertices)
         self.face_count = len(self.faces)
@@ -181,36 +158,10 @@ class QMeshViewer(QOpenGLWidget):
         self.show_grid = display_or_not
         self.update()
 
-    def loadHouNodeAsModel(self, hou_node):
-        self.vertices = []
-        self.faces = []
-        self.vertex_colors = []
-
-        # 读取 Houdini 节点的几何数据
-        geometry = hou_node.geometry()
-        points = geometry.points()
-        polys = geometry.prims()
-
-        # 提取顶点
-        for point in points:
-            position = point.position()
-            self.vertices.append((position[0], position[1], position[2]))
-
-            # 提取颜色
-            if point.attribValue("Cd") is not None:
-                color = point.attribValue("Cd")
-                self.vertex_colors.append((color[0], color[1], color[2]))
-            else:
-                self.vertex_colors.append((0.5, 0.5, 0.5))  # 默认颜色
-
-        # 提取面
-        for poly in polys:
-            vertices = poly.vertices()
-            face = []
-            for vertex in vertices:
-                face.append(vertex.point().number())
-            self.faces.append(face)
-
+    def updateModel(self, vertices, vertex_colors, faces):
+        self.vertices = vertices
+        self.vertex_colors = vertex_colors
+        self.faces = faces
         self.vertex_count = len(self.vertices)
         self.face_count = len(self.faces)
         self.update_counter_label.emit([self.vertex_count, self.face_count])

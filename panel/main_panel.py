@@ -6,6 +6,7 @@ sys.path.append(parent_dir)
 sys.path.append(os.path.join(current_dir, "utils"))
 sys.path.append(os.path.join(current_dir, "qwidget"))
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter
+from PySide2.QtCore import Qt
 from menu_file import FileMenu
 from menu_settings import SettingsMenu
 from menu_window import WindowMenu
@@ -82,11 +83,12 @@ class MainWindow(QMainWindow):
 
     def onOpenMeshViewer(self):
         if self.mesh_viewer_panel.isHidden():
-            hda_node = self._controller.getCurNode()
-            self.mesh_viewer_panel.mesh_viewer.loadHouNodeAsModel(hda_node)
+            self._controller.update_display_model.connect(self.mesh_viewer_panel.mesh_viewer.updateModel, Qt.DirectConnection)
+            self._controller.updateNodeModel()
             self.mesh_viewer_panel.mesh_viewer.autoMoveCamera()
             self.mesh_viewer_panel.show()
         elif self.mesh_viewer_panel.isVisible():
+            self._controller.update_display_model.disconnect()
             self.mesh_viewer_panel.hide()
 
 
