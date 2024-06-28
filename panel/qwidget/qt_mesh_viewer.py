@@ -31,6 +31,10 @@ class QMeshViewer(QOpenGLWidget):
         self.camera_distance = 10
         self.camera_x = 0
         self.camera_y = 0
+
+        self.show_grid = True
+        self.grid_spacing = 1
+
         self.last_mouse_position = None
         self.setMinimumWidth(300)
         self.setMinimumHeight(300)
@@ -87,21 +91,13 @@ class QMeshViewer(QOpenGLWidget):
             0, 1, 0
         )
 
+        glClearColor(0.08, 0.08, 0.11, 1.0)
+
         glRotatef(self.camera_angle_x, 1, 0, 0)
         glRotatef(self.camera_angle_y, 0, 1, 0)
 
-        # 绘制坐标平面
-        glBegin(GL_LINES)
-        glColor3f(1.0, 0.0, 0.0)  # X轴为红色
-        glVertex3f(-100.0, 0.0, 0.0)
-        glVertex3f(100.0, 0.0, 0.0)
-        glColor3f(0.0, 1.0, 0.0)  # Y轴为绿色
-        glVertex3f(0.0, -100.0, 0.0)
-        glVertex3f(0.0, 100.0, 0.0)
-        glColor3f(0.0, 0.0, 1.0)  # Z轴为蓝色
-        glVertex3f(0.0, 0.0, -100.0)
-        glVertex3f(0.0, 0.0, 100.0)
-        glEnd()
+        # Draw the grid and axes
+        self.drawGridAndAxes()
 
         # 绘制立方体面
         if self.show_vertex_colors:
@@ -120,7 +116,7 @@ class QMeshViewer(QOpenGLWidget):
             glEnd()
 
         # 绘制立方体边线
-        glColor3f(1.0, 1.0, 1.0)  # 白色
+        glColor3f(0.5, 0.5, 0.5)  # 白色
         glBegin(GL_LINES)
         for face in self.faces:
             for i in range(len(face)):
@@ -129,12 +125,61 @@ class QMeshViewer(QOpenGLWidget):
         glEnd()
 
         # 绘制顶点
-        glColor3f(1.0, 0.0, 0.0)  # 红色
+        glColor3f(0.02, 0.1, 0.6)  # 暗蓝色
         glPointSize(5.0)
         glBegin(GL_POINTS)
         for vertex in self.vertices:
             glVertex3f(vertex[0], vertex[1], vertex[2])
         glEnd()
+
+    def drawGridAndAxes(self):
+        if self.show_grid:
+            # Adjust grid spacing based on camera distance
+            grid_spacing = 1
+            while self.camera_distance > grid_spacing * 10:
+                grid_spacing *= 10
+            self.grid_spacing = grid_spacing
+
+            # Draw the main grid on the XZ plane with thick lines
+            glColor3f(0.5, 0.5, 0.5)
+            glLineWidth(2.0)  # Thick lines for the main grid
+            glBegin(GL_LINES)
+            for i in range(-100, 101, self.grid_spacing):
+                glVertex3f(i, 0, -100)
+                glVertex3f(i, 0, 100)
+                glVertex3f(-100, 0, i)
+                glVertex3f(100, 0, i)
+            glEnd()
+
+            # Draw the subdivided grid on the XZ plane with thin lines
+            fine_spacing = self.grid_spacing / 10.0
+            glLineWidth(0.75)  # Thin lines for the subdivided grid
+            glBegin(GL_LINES)
+            for i in range(int(-100 / fine_spacing), int(101 / fine_spacing)):
+                if i % 10 != 0:  # Skip main grid lines
+                    glVertex3f(i * fine_spacing, 0, -100)
+                    glVertex3f(i * fine_spacing, 0, 100)
+                    glVertex3f(-100, 0, i * fine_spacing)
+                    glVertex3f(100, 0, i * fine_spacing)
+            glEnd()
+
+        # Draw the axes
+        glLineWidth(3.0)  # Restore line width for the axes
+        glBegin(GL_LINES)
+        glColor3f(1.0, 0.0, 0.0)  # X axis red
+        glVertex3f(-100.0, 0.0, 0.0)
+        glVertex3f(100.0, 0.0, 0.0)
+        glColor3f(0.0, 1.0, 0.0)  # Y axis green
+        glVertex3f(0.0, 0, 0.0)
+        glVertex3f(0.0, 100.0, 0.0)
+        glColor3f(0.0, 0.0, 1.0)  # Z axis blue
+        glVertex3f(0.0, 0.0, -100.0)
+        glVertex3f(0.0, 0.0, 100.0)
+        glEnd()
+
+    def setDisplayAxisGrid(self, display_or_not):
+        self.show_grid = display_or_not
+        self.update()
 
     def loadHouNodeAsModel(self, hou_node):
         self.vertices = []
@@ -260,12 +305,16 @@ class QMeshViewerPanel(QWidget):
         self.checkbox_show_vertex_colors = QCheckBox(getLocalizationStr(LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL_VERTEX_COLOR))
         self.checkbox_show_vertex_colors.setChecked(True)
         self.mesh_viewer.setDisplayPointColor(True)
+        self.checkbox_show_axis_grid = QCheckBox(getLocalizationStr(LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL_DISPLAY_AXIS_GRID))
+        self.checkbox_show_axis_grid.setChecked(True)
+        self.mesh_viewer.setDisplayAxisGrid(True)
         self.button_auto_move_camera = QPushButton(getLocalizationStr(LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL_ADJUST_CAMERA))
 
         # 布局
         parameter_panel = QVBoxLayout()
         parameter_panel.addWidget(self.checkbox_auto_update)
         parameter_panel.addWidget(self.checkbox_show_vertex_colors)
+        parameter_panel.addWidget(self.checkbox_show_axis_grid)
         parameter_panel.addWidget(self.button_auto_move_camera)
         parameter_panel.addStretch()
 
@@ -283,6 +332,7 @@ class QMeshViewerPanel(QWidget):
 
         # 连接信号
         self.checkbox_show_vertex_colors.toggled.connect(self.mesh_viewer.setDisplayPointColor)
+        self.checkbox_show_axis_grid.toggled.connect(self.mesh_viewer.setDisplayAxisGrid)
         self.button_auto_move_camera.clicked.connect(self.mesh_viewer.autoMoveCamera)
 
     def updateCounterLabels(self, counts):
