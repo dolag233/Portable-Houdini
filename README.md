@@ -51,13 +51,15 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 
 按下左下角的**✚**按钮可以增加一个批处理参数值，选中一个批处理参数后点击旁边的 **-** 按钮可以删掉该参数。
 
-批处理参数的意义是——在进行批处理时，会按照批次顺序，将当前批次的HDA属性值设置为对应的属性值进行处理。如果属性在当前批次没有设置属性值，那么会使用**HDA主参数界面的值作为当前批次属性值**。
+批处理参数的意义是——在进行批处理时，会按照批次顺序，将当前批次的HDA属性值设置为对应的属性值进行处理。如果属性在当前批次没有设置属性值，那么会使用**HDA主参数界面的值作为当前批次属性值**。此外，在打开**按钮**类型的批处理面板时，属性值类型为复选框，若复选框在当前批次的属性值为真(即勾选复选框)，那么当前批次会触发点击该按钮的事件。
 
-此外，在打开**按钮**类型的批处理面板时，属性值类型为复选框，若复选框在当前批次的属性值为真(即勾选复选框)，那么当前批次会触发点击该按钮的事件。
+设置完批处理参数值后，参数右侧会显示当前参数的批处理参数个数，鼠标悬停在上面还会显示批处理参数。
 
-设置完批处理参数值后，点击左下角的**应用**即可保存批处理结果。
+在HDA参数界面的左下角会显示批处理的批次总数，点击**批处理**按钮即可进行批处理。
 
-在HDA参数界面的左下角会显示批处理的批次总数，点击**批处理**按钮即可继续批处理。
+<p align="center"><img src="img/screenshot_2.png" alt="screenshot" style="zoom:65%;" /></p>
+
+
 
 ## 路线图
 
@@ -121,15 +123,15 @@ Each HDA parameter has a **✚** button on its right side, allowing you to set b
 
 <p align="center"><img src="img/screenshot_1.png" alt="screenshot" style="zoom:75%;" /></p>
 
-Pressing the **✚** button at the bottom left adds a batch processing parameter value. Selecting a batch processing parameter and clicking the adjacent **-** button removes that parameter.
+Pressing the **✚** button in the lower-left corner adds a batch parameter value. Selecting a batch parameter and clicking the adjacent **-** button deletes the parameter.
 
-The meaning of batch processing parameters is that during batch processing, the HDA attribute value for the current batch will be set to the corresponding attribute value in sequence. If an attribute does not have a set value in the current batch, the **value from the main HDA parameter interface will be used as the attribute value for the current batch**.
+The significance of batch parameters is that during batch processing, the HDA attribute values for the current batch will be set to the corresponding attribute values in the order of the batches. If an attribute does not have a set value in the current batch, the value from the **main HDA parameter interface** will be used as the current batch's attribute value. Additionally, when the **button** type batch processing panel is open, the attribute value type is a checkbox. If the checkbox is checked (i.e., the attribute value is true) in the current batch, the event of clicking that button will be triggered for the current batch.
 
-Additionally, when opening the batch processing panel for a **button** type parameter, the attribute value type is a checkbox. If the checkbox value for the current batch is true (i.e., the checkbox is checked), the event of clicking that button will be triggered for the current batch.
+After setting the batch parameter values, the number of batch parameters for the current parameter will be displayed on the right side of the parameter. Hovering over it with the mouse will also display the batch parameters.
 
-After setting the batch processing parameter values, click the **Apply** button at the bottom left to save the batch processing results.
+The total number of batches for batch processing is displayed in the lower-left corner of the HDA parameter interface. Click the **Batching** button to start batch processing.
 
-The total number of batches is displayed at the bottom left of the HDA parameter interface. Click the **Batch Process** button to continue with batch processing.
+<p align="center"><img src="img/screenshot_2_end.png" alt="screenshot" style="zoom:65%;" /></p>
 
 ## Roadmap
 
