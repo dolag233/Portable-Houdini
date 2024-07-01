@@ -83,11 +83,13 @@ class MainWindow(QMainWindow):
 
     def onOpenMeshViewer(self):
         if self.mesh_viewer_panel.isHidden():
+            self._controller.setAutoUpdateModel(True)
             self._controller.update_display_model.connect(self.mesh_viewer_panel.mesh_viewer.updateModel, Qt.DirectConnection)
             self._controller.updateNodeModel()
             self.mesh_viewer_panel.mesh_viewer.autoMoveCamera()
             self.mesh_viewer_panel.show()
         elif self.mesh_viewer_panel.isVisible():
+            self._controller.setAutoUpdateModel(False)
             self._controller.update_display_model.disconnect()
             self.mesh_viewer_panel.hide()
 

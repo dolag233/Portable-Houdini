@@ -1,3 +1,5 @@
+import sys
+
 from hou_parms_model import HouParamMetaEnum, HouParamTypeEnum
 from utils.globals import APP
 from qwidget.qt_progress_bar import QProgressBarWidget
@@ -22,6 +24,7 @@ class HDAController(QObject):
     _model = None
     _last_model_update_time = 0
     _model_update_interval = 0.005
+    _auto_update_model = False
 
     def __init__(self, model):
         super().__init__()
@@ -185,41 +188,53 @@ class HDAController(QObject):
 
         hou.setUpdateMode(hou.updateMode.AutoUpdate)
 
+    def setAutoUpdateModel(self, auto):
+        if isinstance(auto, bool):
+            self._auto_update_model = auto
+
     def updateNodeModel(self):
-        vertices = []
-        faces = []
-        vertex_colors = []
+        if not self._auto_update_model:
+            return
 
-        # 读取 Houdini 节点的几何数据
-        geometry = self.getCurNode().geometry()
-        points = geometry.points()
-        polys = geometry.prims()
+        try:
+            vertices = []
+            faces = []
+            vertex_colors = []
 
-        # 提取顶点
-        use_default_vertex_color = False
-        if len(points) > 0:
-            if points[0].attribValue("Cd") is None:
-                use_default_vertex_color = True
-                vertex_colors = [(0.5, 0.5, 0.5)] * len(points)
+            # 读取 Houdini 节点的几何数据
+            geometry = self.getCurNode().geometry()
+            points = geometry.points()
+            polys = geometry.prims()
 
-        for point in points:
-            position = point.position()
-            vertices.append((position[0], position[1], position[2]))
+            # 提取顶点
+            use_default_vertex_color = False
+            if len(points) > 0:
+                if points[0].attribValue("Cd") is None:
+                    use_default_vertex_color = True
+                    vertex_colors = [(0.5, 0.5, 0.5)] * len(points)
 
-            # 提取颜色
-            if not use_default_vertex_color:
-                color = point.attribValue("Cd")
-                vertex_colors.append((color[0], color[1], color[2]))
+            for point in points:
+                position = point.position()
+                vertices.append((position[0], position[1], position[2]))
 
-        # 提取面
-        for poly in polys:
-            poly_vertices = poly.vertices()
-            face = []
-            for vertex in poly_vertices:
-                face.append(vertex.point().number())
-            faces.append(face)
+                # 提取颜色
+                if not use_default_vertex_color:
+                    color = point.attribValue("Cd")
+                    vertex_colors.append((color[0], color[1], color[2]))
 
-        self.update_display_model.emit(vertices, vertex_colors, faces)
+            # 提取面
+            for poly in polys:
+                poly_vertices = poly.vertices()
+                face = []
+                for vertex in poly_vertices:
+                    face.append(vertex.point().number())
+                faces.append(face)
+
+            self.update_display_model.emit(vertices, vertex_colors, faces)
+        except Exception as e:
+            self.update_display_model.emit([], [], [])
+            print(e, file=sys.stderr)
+
 
     def unloadHDA(self):
         self._CUR_HDA_PATH = None
