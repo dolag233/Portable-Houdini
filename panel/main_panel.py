@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         hda_mesh_splitter = QSplitter()
         self.hda_panel = HDAPanel(self._model, self._controller)
         self.mesh_viewer_panel = QMeshViewerPanel()
+        self.mesh_viewer_panel.set_auto_update_model.connect(self.setAutoUpdateModel)
         self.mesh_viewer_panel.hide()
         hda_mesh_splitter.addWidget(self.hda_panel)
         hda_mesh_splitter.addWidget(self.mesh_viewer_panel)
@@ -80,6 +81,9 @@ class MainWindow(QMainWindow):
             self.hda_panel.setHDAName(hda_name)
             self.hda_panel.updateUI()
             self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE) + " - " + hda_name)
+
+    def setAutoUpdateModel(self, auto):
+        self._controller.setAutoUpdateModel(auto)
 
     def onOpenMeshViewer(self):
         if self.mesh_viewer_panel.isHidden():

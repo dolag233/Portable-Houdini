@@ -239,6 +239,7 @@ class QMeshViewer(QOpenGLWidget):
 
 
 class QMeshViewerPanel(QWidget):
+    set_auto_update_model = Signal(bool)
     mesh_viewer = None
 
     def __init__(self):
@@ -253,6 +254,7 @@ class QMeshViewerPanel(QWidget):
 
         # 控制面板与复选框
         self.checkbox_auto_update = QCheckBox(getLocalizationStr(LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL_AUTO_UPDATE_NODE))
+        self.checkbox_auto_update.setChecked(True)
         self.checkbox_show_vertex_colors = QCheckBox(getLocalizationStr(LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL_VERTEX_COLOR))
         self.checkbox_show_vertex_colors.setChecked(True)
         self.mesh_viewer.setDisplayPointColor(True)
@@ -285,6 +287,7 @@ class QMeshViewerPanel(QWidget):
         self.checkbox_show_vertex_colors.toggled.connect(self.mesh_viewer.setDisplayPointColor)
         self.checkbox_show_axis_grid.toggled.connect(self.mesh_viewer.setDisplayAxisGrid)
         self.button_auto_move_camera.clicked.connect(self.mesh_viewer.autoMoveCamera)
+        self.checkbox_auto_update.toggled.connect(self.set_auto_update_model.emit)
 
     def updateCounterLabels(self, counts):
         vertex_count, face_count = counts[0], counts[1]
