@@ -209,7 +209,7 @@ class HDAController(QObject):
             # 提取顶点
             use_default_vertex_color = False
             if len(points) > 0:
-                if points[0].attribValue("Cd") is None:
+                if geometry.findPointAttrib("Cd") is None:
                     use_default_vertex_color = True
                     vertex_colors = [(0.5, 0.5, 0.5)] * len(points)
 
