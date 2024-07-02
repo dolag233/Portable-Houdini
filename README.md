@@ -70,7 +70,7 @@ Portable Houdini是一个便携的独立的Houdini界面，能够在不开启Hou
 - [x] 支持(几乎)全部变量类型
 - [x] 支持ToolTips
 - [ ] 支持保存加载参数、批处理、hip
-- [ ] 支持变量禁用和隐藏
+- [ ] 支持folder、变量禁用和隐藏
 - [x] 支持进度条显示
 - [x] 支持设置主题色
 - [ ] 支持简单属性窗口文件夹
@@ -142,7 +142,7 @@ The total number of batches for batch processing is displayed in the lower-left 
 - [x] Support (almost) all variable types
 - [x] Support ToolTips
 - [ ] Support save and load parameters, batches, hip
-- [ ] Support variable disabling and hiding
+- [ ] Support folder, variable disabling and hiding
 - [x] Support progress bar display
 - [x] Support theme color settings
 - [ ] Support simple property window folders
