@@ -159,7 +159,7 @@ class HouParmsModel(QObject):
                 parm_value = {'keys': parm_value.keys(), 'values': parm_value.values(), 'basis': parm_value.basis()}
 
             parm_meta = HouParmMetadata()
-            if parm_type:
+            if parm_type is not None:
                 parm_meta.setData(parm_tuple.name(), parm_label, parm_type, parm_value, parm_help, parm_tuple)
                 if parm_range is not None:
                     parm_meta.setDataSpecific(HouParamMetaEnum.VALUE_RANGE, parm_range)
