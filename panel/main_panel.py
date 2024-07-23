@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
 
         file_menu = FileMenu(self)
         file_menu.load_hda.connect(self.updateHDA)
+        file_menu.save_hip.connect(self.saveHIP)
         menubar.addMenu(file_menu)
 
         settings_menu = SettingsMenu(self)
@@ -81,6 +82,9 @@ class MainWindow(QMainWindow):
             self.hda_panel.setHDAName(hda_name)
             self.hda_panel.updateUI()
             self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE) + " - " + hda_name)
+
+    def saveHIP(self, hda_path):
+        self._controller.saveHIP(hda_path)
 
     def setAutoUpdateModel(self, auto):
         self._controller.setAutoUpdateModel(auto)

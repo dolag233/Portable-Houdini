@@ -1,14 +1,16 @@
 import os
 
-from PySide2.QtWidgets import QMenu, QAction, QFileDialog
+from PySide2.QtWidgets import QMenu, QAction, QFileDialog, QErrorMessage
 from PySide2.QtCore import Signal
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from utils.globals import SETTINGS_MANAGER, SettingsEnum
 from functools import partial
-
+import tkinter as tk
+from tkinter import filedialog
 class FileMenu(QMenu):
     load_hda = Signal(str, str)  # path, name
     load_hip = Signal(str, str)  # path, name
+    save_hip = Signal(str)  # path
 
     def __init__(self, parent=None):
         super().__init__(getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE), parent)
@@ -18,6 +20,7 @@ class FileMenu(QMenu):
         open_hda_action = QAction(getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HDA), self)
         open_hda_action.triggered.connect(self.openHdaFile)
         self.addAction(open_hda_action)
+
         open_hip_action = QAction(getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HIP), self)
         open_hip_action.triggered.connect(self.openHipFile)
         self.addAction(open_hip_action)
@@ -26,10 +29,15 @@ class FileMenu(QMenu):
         self.recent_menu.aboutToShow.connect(self.onHoverRencetFiles)
         self.addMenu(self.recent_menu)
 
+        open_hip_action = QAction(getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_SAVE_HIP), self)
+        open_hip_action.triggered.connect(self.saveHipFile)
+        self.addAction(open_hip_action)
+
     def openHdaFile(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HDA_FILE_DIALOG_TITLE)
-                                                   , "", "HDA Files (*.hda);;HDA Files (*.vtl);;All Files (*)", options=options)
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(self, getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HDA_FILE_DIALOG_TITLE)
+                                                   , "", "HDA Files (*.hda);;HDA Files (*.vtl);;All Files (*)")
+
         if file_path:
             file_name = file_path.split('\\')[-1]
             if len(file_name) == len(file_path):
@@ -40,14 +48,30 @@ class FileMenu(QMenu):
             SETTINGS_MANAGER.saveSettings()
 
     def openHipFile(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HIP_FILE_DIALOG_TITLE)
-                                                   , "", "HIP Files (*.hip);;HIP Files (*.hipc);;All Files (*)", options=options)
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(self, getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_OPEN_HIP_FILE_DIALOG_TITLE)
+                                                   , "", "HIP Files (*.hip);;HIP Files (*.hipc);;All Files (*)")
+
         if file_path:
             file_name = file_path.split('\\')[-1]
             if len(file_name) == len(file_path):
                 file_name = file_name.split('/')[-1]
             self.load_hda.emit(file_path, file_name)
+
+    def saveHipFile(self):
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getSaveFileName(self, getLocalizationStr(LANG_STR_ENUM.UI_MENU_FILE_SAVE_HIP_FILE_DIALOG_TITLE)
+                     , '', "HIP Files (*.hip);;HIP Files (*.hipc);;All Files (*)")
+
+        if not os.path.exists(os.path.dirname(file_path)):
+            msg_box = QErrorMessage()
+            msg_box.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.ERROR_TITLE))
+            msg_box.setText(getLocalizationStr(LANG_STR_ENUM.ERROR_INVALID_FILE_PATH))
+            msg_box.show()
+
+        else:
+            self.save_hip.emit(file_path)
+
 
     def onHoverRencetFiles(self):
         self.recent_menu.clear()

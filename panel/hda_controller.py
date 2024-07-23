@@ -235,6 +235,11 @@ class HDAController(QObject):
             self.update_display_model.emit([], [], [])
             print(e, file=sys.stderr)
 
+    def saveHIP(self, file_path):
+        if self._cur_hda_node is not None:
+            import hou
+            hou.hipFile.save(file_path)
+            print("HIP file saved to {}".format(file_path))
 
     def unloadHDA(self):
         self._CUR_HDA_PATH = None
