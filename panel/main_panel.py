@@ -16,6 +16,7 @@ from hou_parms_model import HouParmsModel
 from hda_controller import HDAController
 from utils.globals import SETTINGS_MANAGER, SettingsEnum
 from panel.qwidget.qt_mesh_viewer import QMeshViewerPanel, QMeshViewer
+from panel.menu_help import HelpMenu
 
 
 class MainWindow(QMainWindow):
@@ -45,6 +46,9 @@ class MainWindow(QMainWindow):
         window_menu = WindowMenu(self)
         menubar.addMenu(window_menu)
         window_menu.open_mesh_viewer.connect(self.onOpenMeshViewer)
+
+        help_menu = HelpMenu(self)
+        menubar.addMenu(help_menu)
 
         # Main widget
         self.main_widget = QWidget()

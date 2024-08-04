@@ -27,6 +27,14 @@ class LANG_STR_ENUM(SimpleEnum):
     UI_MENU_SETTINGS_LANGUAGE = None
     UI_MENU_SETTINGS_LANGUAGE_EN_US = None
     UI_MENU_SETTINGS_LANGUAGE_ZH_CN = None
+    UI_MENU_HELP = None
+    UI_MENU_HELP_PROJECT_URL = None
+    UI_MENU_HELP_UPDATE = None
+    UI_MENU_HELP_UPDATE_TITLE = None
+    UI_MENU_HELP_UPDATE_WARNING = None
+    UI_MENU_HELP_UPDATE_BUTTON = None
+    UI_MENU_HELP_UPDATE_ERROR_SERVER_CONNECTION = None
+    UI_MENU_HELP_UPDATE_ERROR_DOWNLOAD_ERROR = None
     UI_MENU_WINDOW = None
     UI_MENU_WINDOW_MESH_VIEWER = None
     UI_MESH_VIEWER_OPTIONS_PANEL = None
@@ -79,6 +87,14 @@ LANG_MAP = {LANG_STR_ENUM.UI_APPLY: {LANG_ENUM.EN_US: "Apply", LANG_ENUM.ZH_CN: 
             LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE: {LANG_ENUM.EN_US: "Language (Restart required)", LANG_ENUM.ZH_CN: "语言(重启生效)"},
             LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_EN_US: {LANG_ENUM.EN_US: "English", LANG_ENUM.ZH_CN: "English"},
             LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_ZH_CN: {LANG_ENUM.EN_US: "中文", LANG_ENUM.ZH_CN: "中文"},
+            LANG_STR_ENUM.UI_MENU_HELP: {LANG_ENUM.EN_US: "Help", LANG_ENUM.ZH_CN: "帮助"},
+            LANG_STR_ENUM.UI_MENU_HELP_PROJECT_URL: {LANG_ENUM.EN_US: "Project Link", LANG_ENUM.ZH_CN: "项目链接"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE: {LANG_ENUM.EN_US: "Update", LANG_ENUM.ZH_CN: "更新"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE_TITLE: {LANG_ENUM.EN_US: "Update Application", LANG_ENUM.ZH_CN: "更新应用"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE_WARNING: {LANG_ENUM.EN_US: "Clicking the update button will forcibly clear all files of the current tool\nIf you have modified any source files locally, please back them up promptly\nThe software will exit after the update is complete.", LANG_ENUM.ZH_CN: "点击更新按钮后将会强制清除当前工具的所有文件\n如在本地有修改源文件请及时备份\n更新完成后会退出软件。"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE_BUTTON: {LANG_ENUM.EN_US: "Force Update", LANG_ENUM.ZH_CN: "强制更新"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE_ERROR_SERVER_CONNECTION: {LANG_ENUM.EN_US: "Failed to connect to server!", LANG_ENUM.ZH_CN: "连接服务器失败！"},
+            LANG_STR_ENUM.UI_MENU_HELP_UPDATE_ERROR_DOWNLOAD_ERROR: {LANG_ENUM.EN_US: "Encounter some errors when downloading!", LANG_ENUM.ZH_CN: "下载过程中发生错误！"},
             LANG_STR_ENUM.UI_MENU_WINDOW: {LANG_ENUM.EN_US: "Window", LANG_ENUM.ZH_CN: "窗口"},
             LANG_STR_ENUM.UI_MENU_WINDOW_MESH_VIEWER: {LANG_ENUM.EN_US: "Mesh Viewer", LANG_ENUM.ZH_CN: "模型预览窗口"},
             LANG_STR_ENUM.UI_MESH_VIEWER_OPTIONS_PANEL: {LANG_ENUM.EN_US: "Options", LANG_ENUM.ZH_CN: "选项"},

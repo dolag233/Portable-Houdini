@@ -36,6 +36,7 @@ if __name__ == '__main__':
     controller.moveToThread(houdini_thread)  # 现在controller处在单独线程，不会阻塞UI主线程
     houdini_thread.start()
     window = MainWindow(model, controller)
+    globals.MAIN_WINDOW = window
     window.setWindowIcon(QIcon("icon.png"))
     window.show()
     sys.exit(app.exec_())

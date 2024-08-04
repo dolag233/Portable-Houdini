@@ -9,4 +9,6 @@ SETTINGS_MANAGER = SettingsManager()
 
 LANGUAGE = LangStrToEnum(SETTINGS_MANAGER.get(SettingsEnum.LANGUAGE))
 
+MAIN_WINDOW = None
+
 APP = None
