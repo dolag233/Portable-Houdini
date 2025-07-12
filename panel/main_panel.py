@@ -15,7 +15,6 @@ from menu_connection import ConnectionMenu
 from hda_panel import HDAPanel
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParmsModel
-from hda_controller import HDAController
 from remote_hda_controller import RemoteHDAController
 from server_connection_dialog import ServerConnectionDialog
 from utils.globals import SETTINGS_MANAGER, SettingsEnum
@@ -263,7 +262,7 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     model = HouParmsModel()
-    controller = HDAController(model)
+    controller = RemoteHDAController(model)
     window = MainWindow(model, controller)
     window.show()
     sys.exit(app.exec_())
