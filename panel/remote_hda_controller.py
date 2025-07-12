@@ -27,8 +27,6 @@ class RemoteHDAController(QObject):
     update_display_model = Signal(list, list, list)  # [vertices, vertex_colors, faces]
     connection_status_changed = Signal(bool)
     server_error = Signal(str)
-    file_upload_started = Signal(str)  # 文件上传开始
-    file_upload_finished = Signal(str)  # 文件上传完成
     
     def __init__(self, model):
         super().__init__()
@@ -308,29 +306,38 @@ class RemoteHDAController(QObject):
     def clearHDA(self):
         """清除HDA"""
         if self.is_connected():
+            # 清除HDA
             result = self._remote_client.clear_hda()
             if not result.get("success", False):
                 self.server_error.emit(result.get("message", "清除HDA失败"))
+            
+            # 清理临时文件
+            temp_result = self._remote_client.clear_temp_files()
+            if not temp_result.get("success", False):
+                print(f"警告: 清理临时文件失败: {temp_result.get('message', '未知错误')}")
     
     def loadHDA(self):
         """加载HDA"""
         print("远程控制器: 开始加载 HDA")
         
         if self.is_connected() and self._current_hda_path:
-            print(f"远程控制器: 调用远程加载 HDA: {self._current_hda_path}")
+            # 步骤1: 上传HDA文件到服务器
+            print(f"远程控制器: 上传 HDA 文件: {self._current_hda_path}")
+            upload_result = self._remote_client.upload_file(self._current_hda_path)
             
-            # 检查是否为本地文件，如果是则上传
-            if os.path.exists(self._current_hda_path):
-                print("远程控制器: 检测到本地文件，开始上传...")
-                self.file_upload_started.emit(self._current_hda_path)
-                result = self._remote_client.load_uploaded_hda(self._current_hda_path, self._current_hda_name)
-                if result.get("success", False):
-                    self.file_upload_finished.emit("上传成功")
-                else:
-                    self.file_upload_finished.emit("上传失败")
-            else:
-                print("远程控制器: 尝试直接加载远程文件...")
-                result = self._remote_client.load_hda(self._current_hda_path, self._current_hda_name)
+            if not upload_result.get("success", False):
+                error_msg = f"上传HDA文件失败: {upload_result.get('message', '未知错误')}"
+                print(f"远程控制器: 错误 - {error_msg}")
+                self.server_error.emit(error_msg)
+                return False
+            
+            # 获取服务器端的临时文件路径
+            server_hda_path = upload_result.get("temp_path")
+            print(f"远程控制器: 文件已上传到服务器: {server_hda_path}")
+            
+            # 步骤2: 使用服务器端路径加载HDA
+            print(f"远程控制器: 调用远程加载 HDA: {server_hda_path}")
+            result = self._remote_client.load_hda(server_hda_path, self._current_hda_name)
             
             print(f"远程控制器: 服务器响应: {result}")
             
@@ -594,6 +601,10 @@ class RemoteHDAController(QObject):
     
     def unloadHDA(self):
         """卸载HDA"""
+        # 清理远程服务器资源
+        if self.is_connected():
+            self.clearHDA()
+        
         # 远程模式清除本地状态
         self._current_hda_path = None
         self._current_hda_name = None

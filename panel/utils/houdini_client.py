@@ -9,6 +9,7 @@ import time
 import threading
 import json
 import os
+import base64
 from PySide2.QtCore import QObject, Signal, QTimer
 
 
@@ -215,6 +216,39 @@ class HoudiniClient(QObject):
             return {"success": False, "message": error_msg, "error": str(e)}
     
     # 便捷方法
+    def upload_file(self, file_path):
+        """上传文件到服务器"""
+        try:
+            if not os.path.exists(file_path):
+                return {"success": False, "message": f"文件不存在: {file_path}"}
+            
+            # 读取文件内容
+            with open(file_path, 'rb') as f:
+                file_content = f.read()
+            
+            # 编码为base64
+            file_data = base64.b64encode(file_content).decode('utf-8')
+            
+            # 获取文件名
+            filename = os.path.basename(file_path)
+            
+            print(f"正在上传文件: {filename} ({len(file_content)} bytes)")
+            
+            # 调用远程方法
+            result = self.call_remote_method("upload_file", file_data, filename)
+            
+            if result.get("success", False):
+                print(f"文件上传成功: {filename}")
+            else:
+                print(f"文件上传失败: {result.get('message', '未知错误')}")
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"上传文件失败: {str(e)}"
+            print(error_msg)
+            return {"success": False, "message": error_msg, "error": str(e)}
+    
     def load_hda(self, hda_path, hda_name=None):
         """加载HDA"""
         return self.call_remote_method("load_hda", hda_path, hda_name)
@@ -239,63 +273,6 @@ class HoudiniClient(QObject):
         """保存HIP文件"""
         return self.call_remote_method("save_hip", file_path)
     
-    def upload_file(self, local_file_path, remote_file_name=None, file_type="hda"):
-        """上传文件到服务器"""
-        try:
-            import base64
-            
-            if not os.path.exists(local_file_path):
-                return {"success": False, "message": f"本地文件不存在: {local_file_path}"}
-            
-            # 读取文件内容
-            with open(local_file_path, 'rb') as f:
-                file_bytes = f.read()
-            
-            # Base64 编码
-            file_data = base64.b64encode(file_bytes).decode('utf-8')
-            
-            # 使用原文件名或指定的名称
-            if remote_file_name is None:
-                remote_file_name = os.path.basename(local_file_path)
-            
-            print(f"正在上传文件: {local_file_path} -> {remote_file_name} ({len(file_bytes)} bytes)")
-            
-            # 调用远程上传方法
-            return self.call_remote_method("upload_file", file_data, remote_file_name, file_type)
-            
-        except Exception as e:
-            error_msg = f"文件上传失败: {str(e)}"
-            print(error_msg)
-            return {"success": False, "message": error_msg, "error": str(e)}
-    
-    def load_uploaded_hda(self, local_hda_path, hda_name=None):
-        """上传并加载HDA文件"""
-        try:
-            import base64
-            
-            if not os.path.exists(local_hda_path):
-                return {"success": False, "message": f"本地HDA文件不存在: {local_hda_path}"}
-            
-            # 读取HDA文件内容
-            with open(local_hda_path, 'rb') as f:
-                file_bytes = f.read()
-            
-            # Base64 编码
-            file_data = base64.b64encode(file_bytes).decode('utf-8')
-            
-            # 使用原文件名
-            file_name = os.path.basename(local_hda_path)
-            
-            print(f"正在上传并加载HDA: {local_hda_path} -> {file_name} ({len(file_bytes)} bytes)")
-            
-            # 调用远程上传并加载方法
-            return self.call_remote_method("load_uploaded_hda", file_data, file_name, hda_name)
-            
-        except Exception as e:
-            error_msg = f"上传并加载HDA失败: {str(e)}"
-            print(error_msg)
-            return {"success": False, "message": error_msg, "error": str(e)}
-    
     def set_auto_update_model(self, auto_update):
         """设置自动更新模型"""
         return self.call_remote_method("set_auto_update_model", auto_update)
@@ -311,6 +288,10 @@ class HoudiniClient(QObject):
     def clear_hda(self):
         """清除HDA"""
         return self.call_remote_method("clear_hda")
+    
+    def clear_temp_files(self):
+        """清理服务器临时文件"""
+        return self.call_remote_method("clear_temp_files")
     
     def ping_server(self):
         """Ping服务器"""

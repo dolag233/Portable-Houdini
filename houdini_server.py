@@ -13,6 +13,9 @@ import json
 import time
 import threading
 import traceback
+import tempfile
+import base64
+import shutil
 
 def init_houdini_environment_for_server():
     """为服务器初始化Houdini环境"""
@@ -148,7 +151,81 @@ class HoudiniRemoteService:
         self.auto_update_model = False
         self.last_model_update_time = 0
         self.model_update_interval = 0.005
+        
+        # 临时文件管理
+        self.temp_dir = tempfile.mkdtemp(prefix="houdini_server_")
+        self.temp_files = []  # 跟踪临时文件以便清理
+        print(f"临时文件目录: {self.temp_dir}")
     
+    def __del__(self):
+        """析构函数，清理临时文件"""
+        self.cleanup_temp_files()
+    
+    def cleanup_temp_files(self):
+        """清理临时文件"""
+        try:
+            if hasattr(self, 'temp_dir') and os.path.exists(self.temp_dir):
+                shutil.rmtree(self.temp_dir)
+                print(f"已清理临时文件目录: {self.temp_dir}")
+        except Exception as e:
+            print(f"清理临时文件失败: {e}")
+    
+    def upload_file(self, file_data, filename):
+        """上传文件到服务器临时目录"""
+        try:
+            # 解码base64数据
+            if isinstance(file_data, str):
+                file_content = base64.b64decode(file_data)
+            else:
+                file_content = file_data
+            
+            # 创建临时文件
+            temp_file_path = os.path.join(self.temp_dir, filename)
+            
+            # 确保目录存在
+            temp_dir = os.path.dirname(temp_file_path)
+            if temp_dir and not os.path.exists(temp_dir):
+                os.makedirs(temp_dir, exist_ok=True)
+            
+            # 写入文件
+            with open(temp_file_path, 'wb') as f:
+                f.write(file_content)
+            
+            # 记录临时文件
+            self.temp_files.append(temp_file_path)
+            
+            print(f"文件上传成功: {filename} -> {temp_file_path}")
+            
+            return {
+                "success": True,
+                "message": "文件上传成功",
+                "temp_path": temp_file_path,
+                "original_filename": filename
+            }
+            
+        except Exception as e:
+            error_msg = f"文件上传失败: {str(e)}"
+            print(error_msg)
+            return {
+                "success": False,
+                "message": error_msg,
+                "error": str(e)
+            }
+    
+    def clear_temp_files(self):
+        """清理所有临时文件"""
+        try:
+            for temp_file in self.temp_files:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+            self.temp_files.clear()
+            
+            return {"success": True, "message": "临时文件清理成功"}
+        except Exception as e:
+            error_msg = f"清理临时文件失败: {str(e)}"
+            print(error_msg)
+            return {"success": False, "message": error_msg, "error": str(e)}
+
     def clear_hda(self):
         """清除当前HDA"""
         try:
@@ -550,71 +627,6 @@ class HoudiniRemoteService:
             error_msg = f"获取服务器信息失败: {str(e)}"
             print(error_msg)
             return {"success": False, "message": error_msg, "error": str(e)}
-    
-    def upload_file(self, file_data, file_name, file_type="hda"):
-        """上传文件到服务器"""
-        try:
-            import base64
-            import tempfile
-            
-            # 创建临时目录
-            temp_dir = os.path.join(tempfile.gettempdir(), "portable_houdini_uploads")
-            if not os.path.exists(temp_dir):
-                os.makedirs(temp_dir)
-            
-            # 解码文件数据
-            if isinstance(file_data, str):
-                # Base64 编码的数据
-                file_bytes = base64.b64decode(file_data)
-            else:
-                # 二进制数据
-                file_bytes = file_data
-            
-            # 保存文件
-            file_path = os.path.join(temp_dir, file_name)
-            with open(file_path, 'wb') as f:
-                f.write(file_bytes)
-            
-            print(f"文件上传成功: {file_path}")
-            
-            return {
-                "success": True,
-                "message": "文件上传成功",
-                "file_path": file_path,
-                "file_name": file_name,
-                "file_size": len(file_bytes)
-            }
-            
-        except Exception as e:
-            error_msg = f"文件上传失败: {str(e)}"
-            print(error_msg)
-            return {"success": False, "message": error_msg, "error": str(e)}
-    
-    def load_uploaded_hda(self, file_data, file_name, hda_name=None):
-        """上传并加载HDA文件"""
-        try:
-            # 首先上传文件
-            upload_result = self.upload_file(file_data, file_name, "hda")
-            
-            if not upload_result.get("success", False):
-                return upload_result
-            
-            # 然后加载HDA
-            uploaded_file_path = upload_result["file_path"]
-            load_result = self.load_hda(uploaded_file_path, hda_name)
-            
-            if load_result.get("success", False):
-                # 更新结果信息
-                load_result["uploaded_file_path"] = uploaded_file_path
-                load_result["upload_info"] = upload_result
-                print(f"HDA文件上传并加载成功: {uploaded_file_path}")
-            
-            return load_result
-            
-        except Exception as e:
-            error_msg = f"上传并加载HDA失败: {str(e)}"
-            print(error_msg)
-            return {"success": False, "message": error_msg, "error": str(e)}
 
 
 class HoudiniServer:
@@ -655,9 +667,8 @@ class HoudiniServer:
             self.running = True
             print("服务器启动成功！")
             print("可用的远程方法:")
+            print("  - houdini_service.upload_file(file_data, filename)")
             print("  - houdini_service.load_hda(hda_path, hda_name)")
-            print("  - houdini_service.load_uploaded_hda(file_data, file_name, hda_name)")
-            print("  - houdini_service.upload_file(file_data, file_name, file_type)")
             print("  - houdini_service.set_parameter(parm_name, value)")
             print("  - houdini_service.set_parameters(parameters)")
             print("  - houdini_service.get_parameter(parm_name)")
@@ -667,6 +678,7 @@ class HoudiniServer:
             print("  - houdini_service.get_model_data()")
             print("  - houdini_service.get_server_info()")
             print("  - houdini_service.clear_hda()")
+            print("  - houdini_service.clear_temp_files()")
             
             return True
             
