@@ -25,52 +25,52 @@ class QRamp(QWidget):
 
     def setInterpolationModeFromBasis(self, basis):
         # 处理不同格式的 basis 值
-        interpolation = "Linear"
-        
         try:
-            # 如果是字符串格式（如 "rampBasis.CatmullRom"）
+            # 首先检查是否是字符串格式（如 "rampBasis.CatmullRom"）
             if isinstance(basis, str):
-                if "Constant" in basis:
-                    interpolation = "Constant"
-                elif "Linear" in basis:
-                    interpolation = "Linear"
-                elif "CatmullRom" in basis:
-                    interpolation = "Catmull-Rom"
-                elif "MonotoneCubic" in basis:
-                    interpolation = "MonotoneCubic"
-                elif "Bezier" in basis:
-                    interpolation = "Bezier"
-                elif "BSpline" in basis:
-                    interpolation = "BSpline"
-                elif "Hermite" in basis:
-                    interpolation = "Catmull-Rom"  # Hermite 不支持，使用 Catmull-Rom
+                if "." in basis:
+                    # 提取点后面的部分
+                    basis_name = basis.split(".")[-1]
+                    if basis_name == "Constant":
+                        interpolation = "Constant"
+                    elif basis_name == "Linear":
+                        interpolation = "Linear"
+                    elif basis_name == "CatmullRom":
+                        interpolation = "Catmull-Rom"
+                    elif basis_name == "MonotoneCubic":
+                        interpolation = "MonotoneCubic"
+                    elif basis_name == "Bezier":
+                        interpolation = "Bezier"
+                    elif basis_name == "BSpline":
+                        interpolation = "BSpline"
+                    else:
+                        print(f"警告: 未知的 ramp basis 名称: {basis_name}, 使用默认 Linear")
+                        interpolation = "Linear"
                 else:
-                    print(f"警告: 未知的 ramp basis 字符串: {basis}, 使用默认 Linear")
-                    interpolation = "Linear"
+                    # 直接的字符串名称
+                    interpolation = basis
             else:
-                # 如果是枚举对象或整数，转换为整数
-                if hasattr(basis, 'value'):
-                    basis_value = int(basis.value)
-                elif hasattr(basis, '__int__'):
+                # 处理整数值
+                if isinstance(basis, str) and basis.isdigit():
                     basis_value = int(basis)
                 else:
                     basis_value = basis
                     
                 # 根据整数值映射
                 if basis_value == 0:  # Constant
-            interpolation = "Constant"
+                    interpolation = "Constant"
                 elif basis_value == 1:  # Linear
-            interpolation = "Linear"
+                    interpolation = "Linear"
                 elif basis_value == 2:  # CatmullRom
-            interpolation = "Catmull-Rom"
+                    interpolation = "Catmull-Rom"
                 elif basis_value == 3:  # MonotoneCubic
-            interpolation = "MonotoneCubic"
+                    interpolation = "MonotoneCubic"
                 elif basis_value == 4:  # Bezier
-            interpolation = "Bezier"
+                    interpolation = "Bezier"
                 elif basis_value == 5:  # BSpline
-            interpolation = "BSpline"
+                    interpolation = "BSpline"
                 elif basis_value == 6:  # Hermite (not supported)
-            interpolation = "Catmull-Rom"
+                    interpolation = "Catmull-Rom"
                 else:
                     print(f"警告: 未知的 ramp basis 值: {basis_value}, 使用默认 Linear")
                     interpolation = "Linear"
@@ -367,25 +367,25 @@ class QRamp(QWidget):
         
         # 本地模式或检查失败：返回 hou.rampBasis 对象
         try:
-        import hou
-        keys = [p.x() for p in self.points]
-        values = [p.y() for p in self.points]
-        basis = hou.rampBasis.Linear
-        if self.interpolation_mode == "Linear":
+            import hou
+            keys = [p.x() for p in self.points]
+            values = [p.y() for p in self.points]
             basis = hou.rampBasis.Linear
-        elif self.interpolation_mode == "Catmull-Rom":
-            basis = hou.rampBasis.CatmullRom
-        elif self.interpolation_mode == "Constant":
-            basis = hou.rampBasis.Constant
-        elif self.interpolation_mode == "Bezier":
-            basis = hou.rampBasis.Bezier
-        elif self.interpolation_mode == "MonotoneCubic":
-            basis = hou.rampBasis.MonotoneCubic
-        elif self.interpolation_mode == "BSpline":
-            basis = hou.rampBasis.BSpline
+            if self.interpolation_mode == "Linear":
+                basis = hou.rampBasis.Linear
+            elif self.interpolation_mode == "Catmull-Rom":
+                basis = hou.rampBasis.CatmullRom
+            elif self.interpolation_mode == "Constant":
+                basis = hou.rampBasis.Constant
+            elif self.interpolation_mode == "Bezier":
+                basis = hou.rampBasis.Bezier
+            elif self.interpolation_mode == "MonotoneCubic":
+                basis = hou.rampBasis.MonotoneCubic
+            elif self.interpolation_mode == "BSpline":
+                basis = hou.rampBasis.BSpline
 
-        basis = [basis for _ in range(len(keys))]
-        return {"keys": keys, "values": values, "basis": basis}
+            basis = [basis for _ in range(len(keys))]
+            return {"keys": keys, "values": values, "basis": basis}
         except ImportError:
             # 如果没有 hou 模块，返回整数值
             keys = [p.x() for p in self.points]
@@ -425,52 +425,52 @@ class QRampWidget(QWidget):
 
     def setInterpolationModeFromBasis(self, basis):
         # 处理不同格式的 basis 值
-        interpolation = "Linear"
-        
         try:
-            # 如果是字符串格式（如 "rampBasis.CatmullRom"）
+            # 首先检查是否是字符串格式（如 "rampBasis.CatmullRom"）
             if isinstance(basis, str):
-                if "Constant" in basis:
-                    interpolation = "Constant"
-                elif "Linear" in basis:
-                    interpolation = "Linear"
-                elif "CatmullRom" in basis:
-                    interpolation = "Catmull-Rom"
-                elif "MonotoneCubic" in basis:
-                    interpolation = "MonotoneCubic"
-                elif "Bezier" in basis:
-                    interpolation = "Bezier"
-                elif "BSpline" in basis:
-                    interpolation = "BSpline"
-                elif "Hermite" in basis:
-                    interpolation = "Catmull-Rom"  # Hermite 不支持，使用 Catmull-Rom
+                if "." in basis:
+                    # 提取点后面的部分
+                    basis_name = basis.split(".")[-1]
+                    if basis_name == "Constant":
+                        interpolation = "Constant"
+                    elif basis_name == "Linear":
+                        interpolation = "Linear"
+                    elif basis_name == "CatmullRom":
+                        interpolation = "Catmull-Rom"
+                    elif basis_name == "MonotoneCubic":
+                        interpolation = "MonotoneCubic"
+                    elif basis_name == "Bezier":
+                        interpolation = "Bezier"
+                    elif basis_name == "BSpline":
+                        interpolation = "BSpline"
+                    else:
+                        print(f"警告: 未知的 ramp basis 名称: {basis_name}, 使用默认 Linear")
+                        interpolation = "Linear"
                 else:
-                    print(f"警告: 未知的 ramp basis 字符串: {basis}, 使用默认 Linear")
-                    interpolation = "Linear"
+                    # 直接的字符串名称
+                    interpolation = basis
             else:
-                # 如果是枚举对象或整数，转换为整数
-                if hasattr(basis, 'value'):
-                    basis_value = int(basis.value)
-                elif hasattr(basis, '__int__'):
+                # 处理整数值
+                if isinstance(basis, str) and basis.isdigit():
                     basis_value = int(basis)
                 else:
                     basis_value = basis
                     
                 # 根据整数值映射
                 if basis_value == 0:  # Constant
-            interpolation = "Constant"
+                    interpolation = "Constant"
                 elif basis_value == 1:  # Linear
-            interpolation = "Linear"
+                    interpolation = "Linear"
                 elif basis_value == 2:  # CatmullRom
-            interpolation = "Catmull-Rom"
+                    interpolation = "Catmull-Rom"
                 elif basis_value == 3:  # MonotoneCubic
-            interpolation = "MonotoneCubic"
+                    interpolation = "MonotoneCubic"
                 elif basis_value == 4:  # Bezier
-            interpolation = "Bezier"
+                    interpolation = "Bezier"
                 elif basis_value == 5:  # BSpline
-            interpolation = "BSpline"
+                    interpolation = "BSpline"
                 elif basis_value == 6:  # Hermite (not supported)
-            interpolation = "Catmull-Rom"
+                    interpolation = "Catmull-Rom"
                 else:
                     print(f"警告: 未知的 ramp basis 值: {basis_value}, 使用默认 Linear")
                     interpolation = "Linear"
