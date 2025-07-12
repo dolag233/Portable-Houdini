@@ -5,11 +5,13 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 sys.path.append(os.path.join(current_dir, "utils"))
 sys.path.append(os.path.join(current_dir, "qwidget"))
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter
-from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter, QStatusBar, QLabel
+from PySide2.QtCore import Qt, QTimer
+from PySide2.QtGui import QPixmap, QPainter, QColor, QBrush
 from menu_file import FileMenu
 from menu_settings import SettingsMenu
 from menu_window import WindowMenu
+from menu_connection import ConnectionMenu
 from hda_panel import HDAPanel
 from utils.localization import LANG_STR_ENUM, getLocalizationStr
 from hou_parms_model import HouParmsModel
@@ -38,7 +40,12 @@ class MainWindow(QMainWindow):
         # 连接对话框
         self._connection_dialog = None
         
+        # 连接状态指示器
+        self._connection_status_label = None
+        self._status_update_timer = None
+        
         self.initUI()
+        self.setupConnectionStatusIndicator()
 
     def initUI(self):
         self.setWindowTitle(getLocalizationStr(LANG_STR_ENUM.UI_APP_TITLE))
@@ -51,11 +58,14 @@ class MainWindow(QMainWindow):
         file_menu.save_hip.connect(self.saveHIP)
         menubar.addMenu(file_menu)
 
+        # 连接菜单
+        connection_menu = ConnectionMenu(self._controller, self)
+        connection_menu.connection_requested.connect(self.onConnectionRequested)
+        connection_menu.disconnection_requested.connect(self.onDisconnectionRequested)
+        connection_menu.server_settings_requested.connect(self.openServerConnectionDialog)
+        menubar.addMenu(connection_menu)
+
         settings_menu = SettingsMenu(self)
-        # 添加服务器连接菜单项
-        settings_menu.addSeparator()
-        server_action = settings_menu.addAction("服务器连接设置")
-        server_action.triggered.connect(self.openServerConnectionDialog)
         menubar.addMenu(settings_menu)
 
         window_menu = WindowMenu(self)
@@ -79,6 +89,17 @@ class MainWindow(QMainWindow):
         self.main_widget.setLayout(main_widget_layout)
         self.setCentralWidget(self.main_widget)
 
+        # 启动时自动连接到远程服务器
+        if SETTINGS_MANAGER.get(SettingsEnum.AUTO_CONNECT):
+            host = SETTINGS_MANAGER.get(SettingsEnum.REMOTE_HOST)
+            port = SETTINGS_MANAGER.get(SettingsEnum.REMOTE_PORT)
+            print(f"启动时自动连接到 {host}:{port}")
+            self._controller.connect_to_server(host, port)
+        
+        # 设置状态栏
+        self.status_bar = QStatusBar()
+        self.setStatusBar(self.status_bar)
+        
         # 打开上一次打开的hda
         if len(SETTINGS_MANAGER.get(SettingsEnum.RECENT)) > 0:
             file_menu.openRecentFile(SETTINGS_MANAGER.get(SettingsEnum.RECENT)[0])
@@ -157,6 +178,86 @@ class MainWindow(QMainWindow):
         """连接请求处理"""
         print(f"请求连接到 {host}:{port}")
         self._controller.connect_to_server(host, port)
+    
+    def onDisconnectionRequested(self):
+        """断开连接请求处理"""
+        print("请求断开连接")
+        self._controller.disconnect_from_server()
+    
+    def setupConnectionStatusIndicator(self):
+        """设置连接状态指示器"""
+        # 创建状态指示器标签
+        self._connection_status_label = QLabel()
+        self._connection_status_label.setFixedSize(100, 20)
+        self._connection_status_label.setAlignment(Qt.AlignCenter)
+        self._connection_status_label.setStyleSheet("""
+            QLabel {
+                border: 1px solid #666;
+                border-radius: 10px;
+                padding: 2px 6px;
+                font-size: 11px;
+                font-weight: bold;
+                margin: 0px;
+            }
+        """)
+        
+        # 添加到状态栏右侧
+        self.status_bar.addPermanentWidget(self._connection_status_label)
+        
+        # 设置定时器更新状态
+        self._status_update_timer = QTimer()
+        self._status_update_timer.timeout.connect(self.updateConnectionStatus)
+        self._status_update_timer.start(1000)  # 每秒更新一次
+        
+        # 连接控制器的状态变化信号
+        if hasattr(self._controller, 'connection_status_changed'):
+            self._controller.connection_status_changed.connect(self.onConnectionStatusChanged)
+        
+        # 初始更新状态
+        self.updateConnectionStatus()
+    
+    def updateConnectionStatus(self):
+        """更新连接状态显示"""
+        if self._controller and self._controller.is_connected():
+            # 连接状态 - 绿色
+            self._connection_status_label.setText("🟢 已连接")
+            self._connection_status_label.setStyleSheet("""
+                QLabel {
+                    border: 1px solid #4CAF50;
+                    border-radius: 10px;
+                    padding: 2px 6px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    background-color: #E8F5E8;
+                    color: #2E7D32;
+                    margin: 0px;
+                }
+            """)
+        else:
+            # 断开状态 - 红色
+            self._connection_status_label.setText("🔴 未连接")
+            self._connection_status_label.setStyleSheet("""
+                QLabel {
+                    border: 1px solid #F44336;
+                    border-radius: 10px;
+                    padding: 2px 6px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    background-color: #FFEBEE;
+                    color: #C62828;
+                    margin: 0px;
+                }
+            """)
+    
+    def onConnectionStatusChanged(self, connected):
+        """连接状态改变处理"""
+        self.updateConnectionStatus()
+        if connected:
+            print("连接状态：已连接到远程服务器")
+            self.status_bar.showMessage("已连接到远程服务器", 3000)
+        else:
+            print("连接状态：与远程服务器断开连接")
+            self.status_bar.showMessage("与远程服务器断开连接", 3000)
 
 
 if __name__ == '__main__':

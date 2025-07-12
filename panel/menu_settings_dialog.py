@@ -13,10 +13,6 @@ class SettingsDialog(QDialog):
     def initUI(self):
         layout = QFormLayout()
 
-        self.houdini_path = QLineEdit()
-        self.houdini_path.setText(SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH))
-        layout.addRow(getLocalizationStr(LANG_STR_ENUM.UI_MENU_SETTINGS_HOUDINI_ROOT), self.houdini_path)
-
         self.language = QComboBox()
         self.language.addItems([getLocalizationStr(LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_EN_US),
                                 getLocalizationStr(LANG_STR_ENUM.UI_MENU_SETTINGS_LANGUAGE_ZH_CN)])
@@ -36,15 +32,9 @@ class SettingsDialog(QDialog):
         self.setLayout(layout)
 
     def saveSettings(self):
-        SETTINGS_MANAGER.set(SettingsEnum.HOUDINI_PATH, self.houdini_path.text())
         SETTINGS_MANAGER.set(SettingsEnum.LANGUAGE, LangEnumToStr(self.language.currentIndex()))
         SETTINGS_MANAGER.set(SettingsEnum.THEME, self.theme.currentText())
         SETTINGS_MANAGER.saveSettings()
-        HOUDINI_PATH = SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)
-        try:
-            import utils.init_houdini
-        except ImportError:
-            return
         self.flushSettings()
         self.close()
 

@@ -27,11 +27,8 @@ def init_houdini_environment(houdini_path=None, settings_manager=None, show_gui_
         if settings_manager is None:
             return False, "未提供 Houdini 路径或设置管理器"
         
-        try:
-            from settings_manager import SettingsEnum
-            houdini_path = settings_manager.get(SettingsEnum.HOUDINI_PATH)
-        except ImportError:
-            return False, "无法导入设置管理器"
+        # 由于客户端已移除 HOUDINI_PATH 支持，这里直接返回错误
+        return False, "客户端不支持本地 Houdini 模式"
     
     # 验证 Houdini 路径
     if not houdini_path or not os.path.isdir(houdini_path):
@@ -136,17 +133,7 @@ def _show_gui_error(error_message):
         print(f"Houdini 初始化错误: {error_message}")
 
 
-# 向后兼容：保持原有的客户端初始化行为
-if __name__ == "__main__" or 'hou' not in sys.modules:
-    try:
-        from settings_manager import SettingsEnum
-        from globals import SETTINGS_MANAGER
-        
-        success, message = init_houdini_environment(settings_manager=SETTINGS_MANAGER)
-        if not success:
-            raise ImportError(message)
-    except ImportError as e:
-        print(f"Houdini 环境初始化失败: {e}")
-        # 在客户端环境中，这会触发 GUI 错误对话框
-        if 'QApplication' in sys.modules:
-            raise
+# 客户端不再支持本地 Houdini 环境初始化
+# 如果需要 Houdini 环境，请使用远程模式连接到服务器
+if __name__ == "__main__":
+    print("客户端不支持本地 Houdini 环境，请使用远程模式连接到服务器")

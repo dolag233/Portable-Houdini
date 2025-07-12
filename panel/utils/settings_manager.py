@@ -5,10 +5,15 @@ from panel.utils.language_enum import *
 
 
 class SettingsEnum:
-    HOUDINI_PATH = "HOUDINI_PATH"
     LANGUAGE = "LANGUAGE"
     RECENT = "RECENT"
     THEME = "THEME"
+    # 远程连接设置
+    REMOTE_HOST = "REMOTE_HOST"
+    REMOTE_PORT = "REMOTE_PORT"
+    AUTO_CONNECT = "AUTO_CONNECT"
+    CONNECTION_TIMEOUT = "CONNECTION_TIMEOUT"
+    AUTO_RECONNECT = "AUTO_RECONNECT"
 
 
 MAX_RECENT = 8
@@ -31,10 +36,15 @@ class SettingsManager(metaclass=SingletonMeta):
     def __init__(self):
         if not hasattr(self, '_initialized'):
             self._settings = {
-                SettingsEnum.HOUDINI_PATH: "",
                 SettingsEnum.LANGUAGE: LangEnumToStr(LANG_ENUM.EN_US),
                 SettingsEnum.RECENT: [],
-                SettingsEnum.THEME: "auto"
+                SettingsEnum.THEME: "auto",
+                # 远程连接默认设置
+                SettingsEnum.REMOTE_HOST: "localhost",
+                SettingsEnum.REMOTE_PORT: 18811,
+                SettingsEnum.AUTO_CONNECT: False,
+                SettingsEnum.CONNECTION_TIMEOUT: 10,
+                SettingsEnum.AUTO_RECONNECT: True
             }
             self._file_path = self._getSettingsFilePath()
             self.loadSettings()
