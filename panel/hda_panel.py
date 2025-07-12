@@ -80,12 +80,15 @@ class HDAPanel(QWidget):
         self._hda_name = name
 
     def updateUI(self):
+        print("HDA 面板: 开始更新 UI")
         self.clearHDAData()
 
         main_parm_layout = QVBoxLayout()
         if self._model is not None:
             parms_meta = self._model.getParms()
-            for parm_meta in parms_meta:
+            print(f"HDA 面板: 从模型获取到 {len(parms_meta)} 个参数")
+            
+            for i, parm_meta in enumerate(parms_meta):
                 parm_type = parm_meta.getData(HouParamMetaEnum.TYPE)
                 parm_value = parm_meta.getData(HouParamMetaEnum.VALUE)
                 parm_name = parm_meta.getData(HouParamMetaEnum.NAME)
@@ -93,6 +96,9 @@ class HDAPanel(QWidget):
                 parm_help = parm_meta.getData(HouParamMetaEnum.HELP)
                 parm_range = parm_meta.getData(HouParamMetaEnum.VALUE_RANGE)
                 parm_combox = parm_meta.getData(HouParamMetaEnum.COMBOX_DEFINE)
+                
+                print(f"HDA 面板: 处理参数 {i+1}: {parm_name} ({parm_type}) = {parm_value}")
+                
                 parm_ui = None
                 parm_layout = QHBoxLayout()
                 parm_label_ui = QLabel(parm_label)
@@ -109,8 +115,11 @@ class HDAPanel(QWidget):
 
                 elif parm_type == HouParamTypeEnum.FLOAT:
                     parm_ui = QFloatSlider(Qt.Horizontal)
-                    parm_ui.setRange(parm_range[0], parm_range[1])
-                    print(parm_value)
+                    if parm_range is not None:
+                        parm_ui.setRange(parm_range[0], parm_range[1])
+                    else:
+                        parm_ui.setRange(-100.0, 100.0)  # 默认范围
+                    print(f"HDA 面板: 设置浮点参数 {parm_name} = {parm_value}")
                     parm_ui.setValue(parm_value)
                     parm_ui.floatValueChanged.connect(partial(self.updateParm, parm_name))
 
@@ -132,7 +141,10 @@ class HDAPanel(QWidget):
 
                 elif parm_type == HouParamTypeEnum.INT:
                     parm_ui = QIntegerSlider(Qt.Horizontal)
-                    parm_ui.setRange(parm_range[0], parm_range[1])
+                    if parm_range is not None:
+                        parm_ui.setRange(parm_range[0], parm_range[1])
+                    else:
+                        parm_ui.setRange(-100, 100)  # 默认范围
                     parm_ui.setValue(parm_value)
                     parm_ui.valueChanged.connect(partial(self.updateParm, parm_name))
 
@@ -174,6 +186,7 @@ class HDAPanel(QWidget):
                     parm_ui.ramp_widget.edit_finished.connect(partial(self.updateParm, parm_name))
 
                 if parm_ui is not None:
+                    print(f"HDA 面板: 成功创建参数 UI: {parm_name}")
                     self._parms_widget[parm_name] = parm_ui
                     # button不需要label
                     if parm_type != HouParamTypeEnum.BUTTON:
@@ -198,10 +211,16 @@ class HDAPanel(QWidget):
                     # 记录变量值和类型
                     self._parms_value[parm_name] = parm_value
                     self._parms_meta[parm_name] = parm_meta
+                else:
+                    print(f"HDA 面板: 警告 - 无法为参数 {parm_name} ({parm_type}) 创建 UI")
+        else:
+            print("HDA 面板: 警告 - 模型为空")
 
         group_box = QGroupBox(self._hda_name)
         group_box.setLayout(main_parm_layout)
         self.layout.addWidget(group_box)
+        
+        print(f"HDA 面板: UI 更新完成，创建了 {len(self._parms_widget)} 个参数控件")
 
         # expansion button
         self.twirl_layout = QVBoxLayout()

@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+���ڳ�ʼ��Houdini����...
+���ڳ�ʼ�� Houdini ����...
+Error: Failed to config Dolag Tools.
+Please Configure $HOUDINI_USER_PREF/packages/DolagPlugin.json
+Houdini ������ʼ���ɹ���
+Houdini������ʼ���ɹ�: Houdini �����ѳ�ʼ��
+Houdiniģ�鵼��ɹ�
+��������Houdini������...
+��ַ: localhost:18811
+Houdini�汾: 19.5.640
+����������ʧ��: start_server() got an unexpected keyword argument 'host'
+����������ʧ��
+  File "E:\Repositories\PortableHoudini\houdini_server.py", line 508, in start
+    hrpyc.start_server(port=self.port, host=self.host)
+TypeError: start_server() got an unexpected keyword argument 'host'

@@ -17,24 +17,24 @@ theme = Theme()
 app = QApplication(sys.argv)
 from panel.main_panel import MainWindow
 from panel.hou_parms_model import HouParmsModel
-from panel.hda_controller import HDAController
+from panel.remote_hda_controller import RemoteHDAController
 from panel.utils.settings_manager import SettingsEnum, SettingsManager
 from panel.utils.localization import LANG_STR_ENUM, getLocalizationStr
 from PySide2.QtCore import QThread
 globals.APP = app
 
 if __name__ == '__main__':
-    # check if houdini_path is valid
+    # 设置主题
     theme.setTheme()
-    if not os.path.isdir(globals.SETTINGS_MANAGER.get(SettingsEnum.HOUDINI_PATH)):
-        msg_box = QMessageBox(QMessageBox.Warning, getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH), getLocalizationStr(LANG_STR_ENUM.ERROR_HOU_PATH_SETTINGS))
-        msg_box.exec_()
-
+    
+    # 注意：客户端完全不支持本地 Houdini，仅支持远程连接
+    # 移除了 Houdini 路径检查和错误弹窗
+    
     model = HouParmsModel()
-    houdini_thread = QThread()
-    controller = HDAController(model)
-    controller.moveToThread(houdini_thread)  # 现在controller处在单独线程，不会阻塞UI主线程
-    houdini_thread.start()
+    # 使用远程控制器，仅支持远程模式
+    controller = RemoteHDAController(model)
+    controller.set_mode("remote")  # 仅支持远程模式
+    
     window = MainWindow(model, controller)
     globals.MAIN_WINDOW = window
     window.setWindowIcon(QIcon("icon.png"))

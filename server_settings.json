@@ -1,0 +1,13 @@
+{
+  "houdini_path": "D:\\Houdini 19.5",
+  "python_path": "D:\\Houdini 19.5\\python39\\python.exe",
+  "server_port": 18811,
+  "server_host": "localhost",
+  "auto_start": false,
+  "selected_installation": {
+    "name": "Houdini 19.5.640",
+    "path": "D:\\Houdini 19.5",
+    "python_path": "D:\\Houdini 19.5\\python39\\python.exe",
+    "version": "19.5"
+  }
+}

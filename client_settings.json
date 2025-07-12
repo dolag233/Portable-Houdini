@@ -1,0 +1,8 @@
+{
+  "server_host": "localhost",
+  "server_port": 18811,
+  "connection_timeout": 10,
+  "retry_interval": 5,
+  "max_retries": 3,
+  "auto_reconnect": true
+}
