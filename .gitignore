@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 test/backup
 TODO.md
+*settings.json
