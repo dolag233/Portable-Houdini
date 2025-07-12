@@ -27,6 +27,8 @@ class RemoteHDAController(QObject):
     update_display_model = Signal(list, list, list)  # [vertices, vertex_colors, faces]
     connection_status_changed = Signal(bool)
     server_error = Signal(str)
+    file_upload_started = Signal(str)  # 文件上传开始
+    file_upload_finished = Signal(str)  # 文件上传完成
     
     def __init__(self, model):
         super().__init__()
@@ -316,7 +318,19 @@ class RemoteHDAController(QObject):
         
         if self.is_connected() and self._current_hda_path:
             print(f"远程控制器: 调用远程加载 HDA: {self._current_hda_path}")
-            result = self._remote_client.load_hda(self._current_hda_path, self._current_hda_name)
+            
+            # 检查是否为本地文件，如果是则上传
+            if os.path.exists(self._current_hda_path):
+                print("远程控制器: 检测到本地文件，开始上传...")
+                self.file_upload_started.emit(self._current_hda_path)
+                result = self._remote_client.load_uploaded_hda(self._current_hda_path, self._current_hda_name)
+                if result.get("success", False):
+                    self.file_upload_finished.emit("上传成功")
+                else:
+                    self.file_upload_finished.emit("上传失败")
+            else:
+                print("远程控制器: 尝试直接加载远程文件...")
+                result = self._remote_client.load_hda(self._current_hda_path, self._current_hda_name)
             
             print(f"远程控制器: 服务器响应: {result}")
             

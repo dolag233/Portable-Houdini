@@ -212,6 +212,12 @@ class MainWindow(QMainWindow):
         if hasattr(self._controller, 'connection_status_changed'):
             self._controller.connection_status_changed.connect(self.onConnectionStatusChanged)
         
+        # 连接文件上传状态信号
+        if hasattr(self._controller, 'file_upload_started'):
+            self._controller.file_upload_started.connect(self.onFileUploadStarted)
+        if hasattr(self._controller, 'file_upload_finished'):
+            self._controller.file_upload_finished.connect(self.onFileUploadFinished)
+        
         # 初始更新状态
         self.updateConnectionStatus()
     
@@ -257,6 +263,18 @@ class MainWindow(QMainWindow):
         else:
             print("连接状态：与远程服务器断开连接")
             self.status_bar.showMessage("与远程服务器断开连接", 3000)
+    
+    def onFileUploadStarted(self, file_path):
+        """文件上传开始处理"""
+        file_name = os.path.basename(file_path)
+        message = f"正在上传文件: {file_name}..."
+        print(f"文件上传开始: {file_path}")
+        self.status_bar.showMessage(message, 0)  # 0表示一直显示直到被覆盖
+    
+    def onFileUploadFinished(self, status):
+        """文件上传完成处理"""
+        print(f"文件上传完成: {status}")
+        self.status_bar.showMessage(status, 3000)  # 显示3秒
 
 
 if __name__ == '__main__':

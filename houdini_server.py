@@ -550,6 +550,71 @@ class HoudiniRemoteService:
             error_msg = f"获取服务器信息失败: {str(e)}"
             print(error_msg)
             return {"success": False, "message": error_msg, "error": str(e)}
+    
+    def upload_file(self, file_data, file_name, file_type="hda"):
+        """上传文件到服务器"""
+        try:
+            import base64
+            import tempfile
+            
+            # 创建临时目录
+            temp_dir = os.path.join(tempfile.gettempdir(), "portable_houdini_uploads")
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
+            
+            # 解码文件数据
+            if isinstance(file_data, str):
+                # Base64 编码的数据
+                file_bytes = base64.b64decode(file_data)
+            else:
+                # 二进制数据
+                file_bytes = file_data
+            
+            # 保存文件
+            file_path = os.path.join(temp_dir, file_name)
+            with open(file_path, 'wb') as f:
+                f.write(file_bytes)
+            
+            print(f"文件上传成功: {file_path}")
+            
+            return {
+                "success": True,
+                "message": "文件上传成功",
+                "file_path": file_path,
+                "file_name": file_name,
+                "file_size": len(file_bytes)
+            }
+            
+        except Exception as e:
+            error_msg = f"文件上传失败: {str(e)}"
+            print(error_msg)
+            return {"success": False, "message": error_msg, "error": str(e)}
+    
+    def load_uploaded_hda(self, file_data, file_name, hda_name=None):
+        """上传并加载HDA文件"""
+        try:
+            # 首先上传文件
+            upload_result = self.upload_file(file_data, file_name, "hda")
+            
+            if not upload_result.get("success", False):
+                return upload_result
+            
+            # 然后加载HDA
+            uploaded_file_path = upload_result["file_path"]
+            load_result = self.load_hda(uploaded_file_path, hda_name)
+            
+            if load_result.get("success", False):
+                # 更新结果信息
+                load_result["uploaded_file_path"] = uploaded_file_path
+                load_result["upload_info"] = upload_result
+                print(f"HDA文件上传并加载成功: {uploaded_file_path}")
+            
+            return load_result
+            
+        except Exception as e:
+            error_msg = f"上传并加载HDA失败: {str(e)}"
+            print(error_msg)
+            return {"success": False, "message": error_msg, "error": str(e)}
 
 
 class HoudiniServer:
@@ -591,6 +656,8 @@ class HoudiniServer:
             print("服务器启动成功！")
             print("可用的远程方法:")
             print("  - houdini_service.load_hda(hda_path, hda_name)")
+            print("  - houdini_service.load_uploaded_hda(file_data, file_name, hda_name)")
+            print("  - houdini_service.upload_file(file_data, file_name, file_type)")
             print("  - houdini_service.set_parameter(parm_name, value)")
             print("  - houdini_service.set_parameters(parameters)")
             print("  - houdini_service.get_parameter(parm_name)")
