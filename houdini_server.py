@@ -14,8 +14,17 @@ import time
 import threading
 import traceback
 import tempfile
-import base64
 import shutil
+
+def safe_str(obj):
+    """安全地转换对象为字符串，避免Unicode编码错误"""
+    try:
+        result = str(obj)
+        # 移除或替换可能的Unicode字符
+        result = result.encode('ascii', errors='ignore').decode('ascii')
+        return result
+    except:
+        return "未知错误"
 
 def init_houdini_environment_for_server():
     """为服务器初始化Houdini环境"""
@@ -171,7 +180,7 @@ class HoudiniRemoteService:
             print(f"清理临时文件失败: {e}")
     
     def upload_file(self, file_data, filename):
-        """上传文件到服务器临时目录"""
+        """上传文件到服务器临时目录 - 仅支持二进制数据"""
         try:
             # 创建临时文件路径
             temp_file_path = os.path.join(self.temp_dir, filename)
@@ -181,17 +190,17 @@ class HoudiniRemoteService:
             if temp_dir and not os.path.exists(temp_dir):
                 os.makedirs(temp_dir, exist_ok=True)
             
-            # 解码并写入文件
+            # 只接受二进制数据
             if isinstance(file_data, str):
-                # Base64编码的数据
-                file_content = base64.b64decode(file_data)
-            else:
-                # 二进制数据
-                file_content = file_data
+                raise Exception("不支持字符串数据，请使用二进制数据传输")
+            
+            # 验证是否为二进制数据
+            if not isinstance(file_data, (bytes, bytearray)):
+                raise Exception(f"无效的数据类型: {type(file_data)}, 需要二进制数据")
             
             # 写入文件
             with open(temp_file_path, 'wb') as f:
-                f.write(file_content)
+                f.write(file_data)
             
             # 验证文件完整性
             if not os.path.exists(temp_file_path):
@@ -215,12 +224,13 @@ class HoudiniRemoteService:
             }
             
         except Exception as e:
-            error_msg = f"文件上传失败: {str(e)}"
+            error_str = safe_str(e)
+            error_msg = f"文件上传失败: {error_str}"
             print(error_msg)
             return {
                 "success": False,
                 "message": error_msg,
-                "error": str(e)
+                "error": error_str
             }
     
     def clear_temp_files(self):
@@ -326,11 +336,12 @@ class HoudiniRemoteService:
             
         except Exception as e:
             import traceback
-            error_msg = f"加载HDA失败: {str(e)}"
+            error_str = safe_str(e)
+            error_msg = f"加载HDA失败: {error_str}"
             print(error_msg)
             print("错误详情:")
             traceback.print_exc()
-            return {"success": False, "message": error_msg, "error": str(e), "error_type": type(e).__name__}
+            return {"success": False, "message": error_msg, "error": error_str, "error_type": type(e).__name__}
     
     def _extract_node_parameters(self):
         """提取节点参数信息"""
