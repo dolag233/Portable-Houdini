@@ -255,153 +255,82 @@ class HoudiniRemoteService:
     def load_hda(self, hda_path, hda_name=None):
         """加载HDA文件"""
         try:
-            print(f"=== 开始加载HDA ===")
-            print(f"原始HDA路径: {hda_path}")
-            print(f"HDA名称: {hda_name}")
+            print(f"开始加载HDA: {hda_path}")
             
-            # 规范化路径 - 统一使用正斜杠，Houdini更喜欢这种格式
-            normalized_path = os.path.normpath(hda_path).replace('\\', '/')
-            print(f"规范化路径: {normalized_path}")
-            
-            # 验证文件存在
+            # 检查文件是否存在
             if not os.path.exists(hda_path):
-                raise Exception(f"HDA文件不存在: {hda_path}")
-            
-            # 检查文件大小和权限
-            file_size = os.path.getsize(hda_path)
-            print(f"文件大小: {file_size} bytes")
-            
-            if file_size == 0:
-                raise Exception("HDA文件为空")
-            
-            if not os.access(hda_path, os.R_OK):
-                raise Exception(f"无法读取HDA文件: {hda_path}")
+                error_msg = f"HDA文件不存在: {hda_path}"
+                print(error_msg)
+                return {"success": False, "message": error_msg}
             
             # 检查文件头部，确保是有效的HDA文件
             with open(hda_path, 'rb') as f:
                 header = f.read(4)
                 if header != b'INDX':
-                    print(f"⚠️  警告: 文件头部不是标准HDA格式: {header}")
+                    print(f"警告: 文件头部不是标准HDA格式: {header}")
                 else:
-                    print("✅ HDA文件头部验证通过")
+                    print("HDA文件头部验证通过")
             
             # 清除现有场景
             print("清除现有场景...")
             self.clear_hda()
             
-            # 尝试读取HDA文件信息 - 使用多种路径格式
-            print("读取HDA文件定义...")
-            hda_definitions = None
-            last_error = None
+            # 加载HDA文件
+            print(f"正在加载HDA文件: {hda_path}")
+            hou.hda.installFile(hda_path)
             
-            # 尝试不同的路径格式
-            path_variants = [
-                normalized_path,  # 正斜杠路径
-                hda_path,        # 原始路径
-                os.path.abspath(hda_path),  # 绝对路径
-                os.path.abspath(hda_path).replace('\\', '/')  # 绝对路径+正斜杠
-            ]
-            
-            for i, path_variant in enumerate(path_variants):
-                try:
-                    print(f"尝试路径格式 {i+1}: {path_variant}")
-                    hda_definitions = hou.hda.definitionsInFile(path_variant)
-                    if hda_definitions:
-                        print(f"✅ 成功使用路径格式 {i+1}")
-                        break
-                except Exception as e:
-                    last_error = e
-                    print(f"路径格式 {i+1} 失败: {str(e)}")
-                    continue
-            
+            # 获取HDA定义
+            hda_definitions = hou.hda.definitionsInFile(hda_path)
             if not hda_definitions:
-                raise Exception(f"所有路径格式都失败，最后错误: {str(last_error)}")
+                error_msg = f"HDA文件中没有找到有效的定义: {hda_path}"
+                print(error_msg)
+                return {"success": False, "message": error_msg}
             
-            if len(hda_definitions) == 0:
-                raise Exception(f"HDA文件中没有找到定义: {hda_path}")
+            # 使用第一个定义
+            hda_definition = hda_definitions[0]
+            node_type = hda_definition.nodeType()
             
-            print(f"找到 {len(hda_definitions)} 个HDA定义")
-            self.current_hda_def = hda_definitions[0]
-            print(f"使用定义: {self.current_hda_def.nodeTypeName()}")
+            print(f"找到HDA定义: {node_type.name()}")
             
-            # 安装HDA文件
-            print("安装HDA文件...")
-            try:
-                # 使用成功的路径格式
-                hou.hda.installFile(path_variant)
-                print("HDA文件安装成功")
-            except Exception as e:
-                raise Exception(f"安装HDA文件失败: {str(e)}")
+            # 创建HDA节点
+            if node_type.category().name() == "Sop":
+                # SOP节点需要在geometry容器中创建
+                geo_node = hou.node("/obj").createNode("geo", "hda_container")
+                geo_node.children()[0].destroy()  # 删除默认的file节点
+                hda_node = geo_node.createNode(node_type.name(), hda_name or "hda_node")
+            else:
+                # 其他类型的节点
+                hda_node = hou.node("/obj").createNode(node_type.name(), hda_name or "hda_node")
             
-            # 创建节点
-            print("创建节点...")
-            try:
-                obj_net = hou.node("/obj")
-                if not obj_net:
-                    raise Exception("无法获取/obj节点")
-                
-                # 创建geo节点
-                geo_net = obj_net.createNode("geo", "geo")
-                if not geo_net:
-                    raise Exception("无法创建geo节点")
-                
-                print(f"geo节点创建成功: {geo_net.path()}")
-                
-                # 创建HDA节点
-                node_type = self.current_hda_def.nodeTypeName()
-                print(f"创建HDA节点，类型: {node_type}")
-                
-                hda_node = geo_net.createNode(node_type, "hda")
-                if not hda_node:
-                    raise Exception(f"无法创建HDA节点，类型: {node_type}")
-                
-                print(f"HDA节点创建成功: {hda_node.path()}")
-                
-            except Exception as e:
-                raise Exception(f"创建节点失败: {str(e)}")
+            self.hda_node = hda_node
+            self.hda_definition = hda_definition
             
-            # 设置当前状态
-            self.current_hda_path = hda_path
-            self.current_hda_name = hda_name or os.path.basename(hda_path)
-            self.current_hda_node = hda_node
+            print(f"HDA节点创建成功: {hda_node.path()}")
             
-            print("提取参数信息...")
-            # 获取参数信息
-            try:
-                self.node_parms = self._extract_node_parameters()
-                print(f"提取到 {len(self.node_parms)} 个参数")
-            except Exception as e:
-                print(f"警告: 提取参数信息失败: {str(e)}")
-                self.node_parms = []
+            # 提取参数信息
+            self._extract_node_parameters()
             
-            print("=== HDA加载成功 ===")
+            # 设置布局
+            if hasattr(hda_node.parent(), 'layoutChildren'):
+                hda_node.parent().layoutChildren()
+            
+            print(f"HDA加载完成: {hda_node.path()}")
+            
             return {
-                "success": True,
-                "message": "HDA加载成功",
-                "hda_path": hda_path,
-                "hda_name": self.current_hda_name,
+                "success": True, 
+                "message": f"HDA加载成功: {hda_node.path()}",
                 "node_path": hda_node.path(),
-                "node_type": node_type,
-                "file_size": file_size,
-                "parameters": self.node_parms
+                "node_type": node_type.name(),
+                "parameter_count": len(self.parameters)
             }
             
         except Exception as e:
-            error_msg = f"加载HDA失败: {str(e)}"
-            print(f"=== HDA加载失败 ===")
-            print(f"错误: {error_msg}")
-            print(f"异常类型: {type(e).__name__}")
-            
-            # 打印详细的错误堆栈
             import traceback
+            error_msg = f"加载HDA失败: {str(e)}"
+            print(error_msg)
+            print("错误详情:")
             traceback.print_exc()
-            
-            return {
-                "success": False,
-                "message": error_msg,
-                "error": str(e),
-                "error_type": type(e).__name__
-            }
+            return {"success": False, "message": error_msg, "error": str(e), "error_type": type(e).__name__}
     
     def _extract_node_parameters(self):
         """提取节点参数信息"""

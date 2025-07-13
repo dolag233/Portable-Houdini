@@ -9,7 +9,6 @@ import time
 import threading
 import json
 import os
-import base64
 from PySide2.QtCore import QObject, Signal, QTimer
 
 
@@ -226,30 +225,23 @@ class HoudiniClient(QObject):
             with open(file_path, 'rb') as f:
                 file_content = f.read()
             
-            original_size = len(file_content)
-            print(f"正在上传文件: {os.path.basename(file_path)} ({original_size} bytes)")
-            
-            # 编码为base64
-            file_data = base64.b64encode(file_content).decode('utf-8')
-            encoded_size = len(file_data)
-            
-            # 获取文件名
+            file_size = len(file_content)
             filename = os.path.basename(file_path)
             
-            print(f"Base64编码: {original_size} bytes -> {encoded_size} chars")
+            print(f"正在上传文件: {filename} ({file_size} bytes)")
             
-            # 调用远程方法
-            result = self.call_remote_method("upload_file", file_data, filename)
+            # 直接传输二进制数据，不使用Base64编码
+            result = self.call_remote_method("upload_file", file_content, filename)
             
             if result.get("success", False):
                 # 验证上传的文件大小
                 uploaded_size = result.get("file_size", 0)
-                if uploaded_size == original_size:
-                    print(f"✅ 文件上传成功: {filename} (大小验证通过)")
+                if uploaded_size == file_size:
+                    print(f"文件上传成功: {filename} (大小验证通过)")
                 else:
-                    print(f"⚠️  文件上传成功但大小不匹配: 原始 {original_size} vs 上传 {uploaded_size}")
+                    print(f"文件上传成功但大小不匹配: 原始 {file_size} vs 上传 {uploaded_size}")
             else:
-                print(f"❌ 文件上传失败: {result.get('message', '未知错误')}")
+                print(f"文件上传失败: {result.get('message', '未知错误')}")
             
             return result
             
