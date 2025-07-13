@@ -173,13 +173,7 @@ class HoudiniRemoteService:
     def upload_file(self, file_data, filename):
         """上传文件到服务器临时目录"""
         try:
-            # 解码base64数据
-            if isinstance(file_data, str):
-                file_content = base64.b64decode(file_data)
-            else:
-                file_content = file_data
-            
-            # 创建临时文件
+            # 创建临时文件路径
             temp_file_path = os.path.join(self.temp_dir, filename)
             
             # 确保目录存在
@@ -187,20 +181,37 @@ class HoudiniRemoteService:
             if temp_dir and not os.path.exists(temp_dir):
                 os.makedirs(temp_dir, exist_ok=True)
             
+            # 解码并写入文件
+            if isinstance(file_data, str):
+                # Base64编码的数据
+                file_content = base64.b64decode(file_data)
+            else:
+                # 二进制数据
+                file_content = file_data
+            
             # 写入文件
             with open(temp_file_path, 'wb') as f:
                 f.write(file_content)
             
+            # 验证文件完整性
+            if not os.path.exists(temp_file_path):
+                raise Exception("临时文件创建失败")
+            
+            file_size = os.path.getsize(temp_file_path)
+            if file_size == 0:
+                raise Exception("临时文件为空")
+            
             # 记录临时文件
             self.temp_files.append(temp_file_path)
             
-            print(f"文件上传成功: {filename} -> {temp_file_path}")
+            print(f"文件上传成功: {filename} -> {temp_file_path} ({file_size} bytes)")
             
             return {
                 "success": True,
                 "message": "文件上传成功",
                 "temp_path": temp_file_path,
-                "original_filename": filename
+                "original_filename": filename,
+                "file_size": file_size
             }
             
         except Exception as e:
@@ -260,33 +271,64 @@ class HoudiniRemoteService:
             file_size = os.path.getsize(hda_path)
             print(f"文件大小: {file_size} bytes")
             
+            if file_size == 0:
+                raise Exception("HDA文件为空")
+            
             if not os.access(hda_path, os.R_OK):
                 raise Exception(f"无法读取HDA文件: {hda_path}")
+            
+            # 检查文件头部，确保是有效的HDA文件
+            with open(hda_path, 'rb') as f:
+                header = f.read(4)
+                if header != b'INDX':
+                    print(f"⚠️  警告: 文件头部不是标准HDA格式: {header}")
+                else:
+                    print("✅ HDA文件头部验证通过")
             
             # 清除现有场景
             print("清除现有场景...")
             self.clear_hda()
             
-            # 尝试读取HDA文件信息
+            # 尝试读取HDA文件信息 - 使用多种路径格式
             print("读取HDA文件定义...")
-            try:
-                # 使用规范化路径
-                hda_definitions = hou.hda.definitionsInFile(normalized_path)
-                if not hda_definitions:
-                    raise Exception(f"HDA文件中没有找到定义: {normalized_path}")
-                
-                print(f"找到 {len(hda_definitions)} 个HDA定义")
-                self.current_hda_def = hda_definitions[0]
-                print(f"使用定义: {self.current_hda_def.nodeTypeName()}")
-                
-            except Exception as e:
-                raise Exception(f"读取HDA定义失败: {str(e)}")
+            hda_definitions = None
+            last_error = None
+            
+            # 尝试不同的路径格式
+            path_variants = [
+                normalized_path,  # 正斜杠路径
+                hda_path,        # 原始路径
+                os.path.abspath(hda_path),  # 绝对路径
+                os.path.abspath(hda_path).replace('\\', '/')  # 绝对路径+正斜杠
+            ]
+            
+            for i, path_variant in enumerate(path_variants):
+                try:
+                    print(f"尝试路径格式 {i+1}: {path_variant}")
+                    hda_definitions = hou.hda.definitionsInFile(path_variant)
+                    if hda_definitions:
+                        print(f"✅ 成功使用路径格式 {i+1}")
+                        break
+                except Exception as e:
+                    last_error = e
+                    print(f"路径格式 {i+1} 失败: {str(e)}")
+                    continue
+            
+            if not hda_definitions:
+                raise Exception(f"所有路径格式都失败，最后错误: {str(last_error)}")
+            
+            if len(hda_definitions) == 0:
+                raise Exception(f"HDA文件中没有找到定义: {hda_path}")
+            
+            print(f"找到 {len(hda_definitions)} 个HDA定义")
+            self.current_hda_def = hda_definitions[0]
+            print(f"使用定义: {self.current_hda_def.nodeTypeName()}")
             
             # 安装HDA文件
             print("安装HDA文件...")
             try:
-                # 使用规范化路径
-                hou.hda.installFile(normalized_path)
+                # 使用成功的路径格式
+                hou.hda.installFile(path_variant)
                 print("HDA文件安装成功")
             except Exception as e:
                 raise Exception(f"安装HDA文件失败: {str(e)}")

@@ -13,8 +13,8 @@ and you can treat hou just as though you imported the hou module.
 """
 
 try:
-    from future import standard_library
-    standard_library.install_aliases()
+from future import standard_library
+standard_library.install_aliases()
 except ImportError:
     # future 模块不可用时忽略
     pass
