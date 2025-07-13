@@ -58,35 +58,36 @@ def init_houdini_environment(houdini_path=None, settings_manager=None, show_gui_
     
     # 准备 Houdini 环境
     old_dlopen_flags = None
-        if hasattr(sys, "setdlopenflags"):
-            old_dlopen_flags = sys.getdlopenflags()
-            sys.setdlopenflags(old_dlopen_flags | os.RTLD_GLOBAL)
+    if hasattr(sys, "setdlopenflags"):
+        old_dlopen_flags = sys.getdlopenflags()
+        sys.setdlopenflags(old_dlopen_flags | os.RTLD_GLOBAL)
 
-        if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
+    if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
         os.add_dll_directory(f"{houdini_path}/bin")
 
-        try:
-            import hou
+    try:
+        import hou
         print("Houdini 环境初始化成功！")
         return True, "Houdini 环境初始化成功"
-        except ImportError:
-        try:
-            sys.path.append(pylib_path)
-            import hou
-            print("Houdini 环境初始化成功！")
-            return True, "Houdini 环境初始化成功"
-        except ImportError as e:
-            error_msg = f"无法导入 Houdini 模块: {e}"
-            if show_gui_error:
-                _show_gui_error(error_msg)
-            return False, error_msg
-        finally:
+    except ImportError:
+        pass
+    try:
+        sys.path.append(pylib_path)
+        import hou
+        print("Houdini 环境初始化成功！")
+        return True, "Houdini 环境初始化成功"
+    except ImportError as e:
+        error_msg = f"无法导入 Houdini 模块: {e}"
+        if show_gui_error:
+            _show_gui_error(error_msg)
+        return False, error_msg
+    finally:
         if old_dlopen_flags is not None and hasattr(sys, "setdlopenflags"):
-                sys.setdlopenflags(old_dlopen_flags)
+            sys.setdlopenflags(old_dlopen_flags)
 
-        # 恢复原始 PATH
-        if os_path:
-            os.environ["PATH"] += ";" + os_path
+    # 恢复原始 PATH
+    if os_path:
+        os.environ["PATH"] += ";" + os_path
 
 
 def init_houdini_server(houdini_path):
